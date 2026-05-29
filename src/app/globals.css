@@ -1,0 +1,238 @@
+@import "tailwindcss";
+@import "ag-grid-community/styles/ag-theme-quartz.css";
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-fg);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-fg);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-fg);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-fg);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-fg);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-fg);
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-fg);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ============ QUANTUM DARK (default) ============ */
+.quantum-dark {
+  --bg: #0a0e1a;
+  --fg: #e8edf5;
+  --primary: #3b82f6;
+  --primary-fg: #ffffff;
+  --secondary: #1e293b;
+  --secondary-fg: #94a3b8;
+  --accent: rgba(255, 255, 255, 0.06);
+  --accent-fg: #e8edf5;
+  --muted: rgba(255, 255, 255, 0.04);
+  --muted-fg: #64748b;
+  --card: rgba(255, 255, 255, 0.04);
+  --card-fg: #e8edf5;
+  --border: rgba(255, 255, 255, 0.08);
+  --destructive: #ef4444;
+  --destructive-fg: #ffffff;
+  --sidebar: #0d1326;
+  --sidebar-fg: #94a3b8;
+  --tooltip-bg: #1e293b;
+  --glow-1: rgba(59, 130, 246, 0.12);
+  --glow-2: rgba(139, 92, 246, 0.08);
+}
+
+/* ============ AETHER LIGHT ============ */
+.aether-light {
+  --bg: #f8fafc;
+  --fg: #0f172a;
+  --primary: #3b82f6;
+  --primary-fg: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-fg: #475569;
+  --accent: rgba(0, 0, 0, 0.04);
+  --accent-fg: #0f172a;
+  --muted: rgba(0, 0, 0, 0.03);
+  --muted-fg: #94a3b8;
+  --card: #ffffff;
+  --card-fg: #0f172a;
+  --border: rgba(0, 0, 0, 0.08);
+  --destructive: #ef4444;
+  --destructive-fg: #ffffff;
+  --sidebar: #ffffff;
+  --sidebar-fg: #475569;
+  --tooltip-bg: #ffffff;
+  --glow-1: rgba(59, 130, 246, 0.06);
+  --glow-2: rgba(139, 92, 246, 0.04);
+}
+
+/* ============ NEBULA VIOLET ============ */
+.nebula-violet {
+  --bg: #0f0a1e;
+  --fg: #e8dff5;
+  --primary: #a855f7;
+  --primary-fg: #ffffff;
+  --secondary: #1e1338;
+  --secondary-fg: #a78bfa;
+  --accent: rgba(168, 85, 247, 0.08);
+  --accent-fg: #e8dff5;
+  --muted: rgba(168, 85, 247, 0.04);
+  --muted-fg: #7c6fa0;
+  --card: rgba(168, 85, 247, 0.04);
+  --card-fg: #e8dff5;
+  --border: rgba(168, 85, 247, 0.1);
+  --destructive: #ef4444;
+  --destructive-fg: #ffffff;
+  --sidebar: #140b28;
+  --sidebar-fg: #a78bfa;
+  --tooltip-bg: #1e1338;
+  --glow-1: rgba(168, 85, 247, 0.15);
+  --glow-2: rgba(236, 72, 153, 0.1);
+}
+
+/* ============ GLOBAL STYLES ============ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Glass card pattern (replicating current Blazor design) */
+.glass-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+}
+
+/* AG Grid theme overrides for dark themes */
+.quantum-dark .ag-theme-quartz,
+.nebula-violet .ag-theme-quartz {
+  --ag-background-color: var(--card);
+  --ag-odd-row-background-color: var(--muted);
+  --ag-header-background-color: var(--secondary);
+  --ag-header-foreground-color: var(--fg);
+  --ag-foreground-color: var(--fg);
+  --ag-border-color: var(--border);
+  --ag-secondary-foreground-color: var(--muted-fg);
+  --ag-row-hover-color: var(--accent);
+  --ag-selected-row-background-color: var(--primary);
+  --ag-input-background-color: var(--card);
+  --ag-input-border-color: var(--border);
+  --ag-font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* AG Grid theme overrides for light theme */
+.aether-light .ag-theme-quartz {
+  --ag-background-color: var(--card);
+  --ag-odd-row-background-color: var(--muted);
+  --ag-header-background-color: var(--secondary);
+  --ag-header-foreground-color: var(--fg);
+  --ag-foreground-color: var(--fg);
+  --ag-border-color: var(--border);
+  --ag-secondary-foreground-color: var(--muted-fg);
+  --ag-row-hover-color: var(--accent);
+  --ag-selected-row-background-color: var(--primary);
+  --ag-input-background-color: var(--card);
+  --ag-font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Glow spheres for dashboard */
+.glow-sphere-1 {
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, var(--glow-1) 0%, transparent 65%);
+  border-radius: 50%;
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-sphere-2 {
+  position: absolute;
+  bottom: -150px;
+  left: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--glow-2) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Toast notification styles */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  color: var(--fg);
+  max-width: 360px;
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0% { transform: scale(1); opacity: 0.85; }
+  70% { transform: scale(3); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* Skeleton loading styles */
+.skeleton {
+  background: linear-gradient(90deg, var(--muted) 25%, var(--accent) 50%, var(--muted) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-fg);
+}

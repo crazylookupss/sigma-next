@@ -1,0 +1,207 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { AgGridReact } from "ag-grid-react";
+import type { ColDef } from "ag-grid-community";
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import { useApplications } from "@/hooks/use-applications";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { RefreshCw, Search, Code2 } from "lucide-react";
+import type { EntraApplication } from "@/types/application";
+import { formatDate } from "@/lib/utils";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
+
+export default function AppRegistrationsPage() {
+  const router = useRouter();
+  const { data, isLoading, error, refetch, isFetching } = useApplications();
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    console.log("[SIGMA] appRegistrationsData received:", data);
+    if (!data) return [];
+
+    let list: any[] = [];
+    if (Array.isArray(data)) {
+      list = data;
+    } else if (data && typeof data === "object") {
+      if (Array.isArray((data as any).data)) {
+        list = (data as any).data;
+      } else if ((data as any).data && typeof (data as any).data === "object" && Array.isArray((data as any).data.data)) {
+        list = (data as any).data.data;
+      }
+    }
+
+    console.log("[SIGMA] Resolved app registrations list:", list);
+
+    if (!search.trim()) return list;
+    const q = search.toLowerCase();
+    return list.filter(
+      (a) =>
+        a.displayName?.toLowerCase().includes(q) ||
+        a.appId?.toLowerCase().includes(q) ||
+        a.publisherDomain?.toLowerCase().includes(q)
+    );
+  }, [data, search]);
+
+  const colDefs: ColDef<EntraApplication>[] = useMemo(
+    () => [
+      {
+        field: "displayName",
+        headerName: "Display Name",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        width: 300,
+        cellRenderer: (params: { value: string }) => (
+          <div className="flex items-center gap-3 h-full">
+            <div className="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-500 flex items-center justify-center text-sm font-bold">
+              {params.value?.[0]?.toUpperCase() ?? "A"}
+            </div>
+            <span className="font-medium">{params.value}</span>
+          </div>
+        ),
+      },
+      {
+        field: "appId",
+        headerName: "Application (Client) ID",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        width: 280,
+        cellRenderer: (params: { value: string }) => (
+          <span className="font-mono text-xs text-muted-foreground">{params.value}</span>
+        ),
+      },
+      {
+        field: "publisherDomain",
+        headerName: "Publisher Domain",
+        sortable: true,
+        filter: "agTextColumnFilter",
+        width: 200,
+      },
+      {
+        field: "signInAudience",
+        headerName: "Sign-In Audience",
+        sortable: true,
+        width: 180,
+        cellRenderer: (params: { value: string }) => (
+          <Badge variant="outline">{params.value}</Badge>
+        ),
+      },
+      {
+        field: "createdDateTime",
+        headerName: "Created",
+        sortable: true,
+        width: 160,
+        cellRenderer: (params: { value: string | null }) => (
+          <span className="text-muted-foreground">{formatDate(params.value)}</span>
+        ),
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="relative z-10">
+      <div className="flex items-center gap-1 mb-4 text-sm text-muted-foreground">
+        <span>Applications</span>
+        <ChevronRightIcon />
+        <span className="text-primary font-semibold">App Registrations</span>
+      </div>
+
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">App Registrations</h1>
+          <p className="text-sm text-muted-foreground">
+            View and manage application registrations in the directory.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {!isLoading && (
+            <span className="text-sm text-muted-foreground">
+              {filtered.length} apps
+            </span>
+          )}
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="p-2 rounded-lg glass-card hover:bg-accent transition-colors text-muted-foreground disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
+          </button>
+        </div>
+      </div>
+
+      <div className="glass-card p-4 mb-4">
+        <div className="relative max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search app registrations..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 bg-accent border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+          />
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="glass-card p-6 space-y-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4">
+              <Skeleton className="w-8 h-8 rounded-lg" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-3 w-1/4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="glass-card p-8 text-center">
+          <Code2 className="w-12 h-12 text-destructive mx-auto mb-4" />
+          <p className="text-foreground font-medium mb-1">Failed to load app registrations</p>
+          <p className="text-sm text-muted-foreground mb-4">{(error as Error).message}</p>
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90"
+          >
+            Retry
+          </button>
+        </div>
+      ) : (
+        <div className="glass-card overflow-hidden">
+          <div className="ag-theme-quartz" style={{ height: "calc(100vh - 320px)", minHeight: 400 }}>
+            <AgGridReact
+              rowData={filtered}
+              columnDefs={colDefs}
+              pagination={true}
+              paginationPageSize={50}
+              defaultColDef={{
+                resizable: true,
+                cellStyle: { display: "flex", alignItems: "center" },
+              }}
+              rowHeight={52}
+              headerHeight={44}
+              suppressCellFocus={true}
+              animateRows={true}
+              onRowClicked={(e) => {
+                if (e.data?.id) router.push(`/app-registrations/${e.data.id}`);
+              }}
+              rowStyle={{ cursor: "pointer" }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ChevronRightIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  );
+}
