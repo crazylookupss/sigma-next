@@ -9,6 +9,8 @@ import {
   Group,
   AppWindow,
   Code2,
+  Shield,
+  AlertCircle,
   ChevronLeft,
 } from "lucide-react";
 import { useSidebarStore } from "@/stores/sidebar";
@@ -20,6 +22,7 @@ const navItems = [
   { href: "/groups", label: "Groups", icon: Group },
   { href: "/applications", label: "Enterprise Apps", icon: AppWindow },
   { href: "/app-registrations", label: "App Registrations", icon: Code2 },
+  { href: "/governance/findings", label: "Governance Findings", icon: Shield },
 ];
 
 export function Sidebar() {

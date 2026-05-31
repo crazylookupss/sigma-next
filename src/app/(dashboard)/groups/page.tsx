@@ -87,7 +87,7 @@ export default function GroupsPage() {
         type: "numericColumn",
       },
       {
-        field: "ownerCount",
+        field: "ownersCount",
         headerName: "Owners",
         sortable: true,
         width: 110,

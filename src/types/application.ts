@@ -74,6 +74,7 @@ export interface EntraApplication {
   publisherDomain: string;
   createdDateTime: string | null;
   tags: string[];
+  ownersCount?: number | null;
 
   // Enriched properties for detailed view
   identifierUris?: string[];
@@ -238,7 +239,9 @@ export interface SsoCertificate {
 }
 
 export interface ServicePrincipalSsoConfig {
+  isConfigured: boolean;
   preferredSingleSignOnMode: string;
+  detectedPrimaryProtocol: string | null;
   samlMetadataUrl: string | null;
   entityId: string | null;
   replyUrls: string[];
@@ -253,4 +256,68 @@ export interface ServicePrincipalSsoConfig {
   loginUrl: string | null;
   microsoftEntraIdentifier: string | null;
   tenantId: string | null;
+  // Claims
+  groupMembershipClaims: string | null;
+  optionalClaims: string[];
+  samlClaims: SamlClaim[];
+  // OIDC
+  enableIdTokenIssuance: boolean | null;
+  enableAccessTokenIssuance: boolean | null;
+}
+
+export interface SamlClaim {
+  name: string;
+  value: string;
+  namespace: string;
+  isOptional: boolean;
+}
+
+// Protocol Analysis Types
+
+export interface ProtocolEvidence {
+  source: string;
+  field: string;
+  value: string | null;
+  weight: number;
+  description: string;
+  category: string;
+}
+
+export interface ProtocolDetection {
+  protocol: string;
+  confidence: "High" | "Medium" | "Low";
+  score: number;
+  maxPossibleScore: number;
+  normalizedScore: number;
+  evidence: ProtocolEvidence[];
+  isDetected: boolean;
+}
+
+export interface GovernanceInsight {
+  severity: "Critical" | "Warning" | "Info";
+  category: string;
+  message: string;
+}
+
+export interface ProtocolAnalysisResult {
+  primaryProtocol: string;
+  detectedProtocols: ProtocolDetection[];
+  allEvidence: ProtocolEvidence[];
+  governanceInsights: GovernanceInsight[];
+  analysisTimestamp: string;
+  servicePrincipalId: string;
+  servicePrincipalDisplayName: string | null;
+}
+
+// Proxy Configuration Types
+
+export interface ServicePrincipalProxyConfig {
+  isConfigured: boolean;
+  externalUrl: string | null;
+  internalUrl: string | null;
+  preAuthentication: string | null;
+  isTranslationUrlEnabled: boolean;
+  translateUrlsInBody: boolean;
+  translateLinksInBody: boolean;
+  verifyDomainCertificates: boolean;
 }

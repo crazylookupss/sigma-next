@@ -14,6 +14,8 @@ import type {
   EntraAppAssignment,
   EntraAppOwner,
   ServicePrincipalSsoConfig,
+  ProtocolAnalysisResult,
+  ServicePrincipalProxyConfig,
 } from "@/types/application";
 
 export const applicationService = {
@@ -82,4 +84,12 @@ export const applicationService = {
 
   getServicePrincipalSsoConfig: (id: string, signal?: AbortSignal) =>
     fetchApi<ServicePrincipalSsoConfig>(`/service-principals/${id}/sso-config`, { signal }),
+
+  // Protocol Analysis
+  getProtocolAnalysis: (id: string, signal?: AbortSignal) =>
+    fetchApi<ProtocolAnalysisResult>(`/service-principals/${id}/protocol-analysis`, { signal }),
+
+  // Proxy Configuration
+  getProxyConfiguration: (id: string, signal?: AbortSignal) =>
+    fetchApi<ServicePrincipalProxyConfig>(`/service-principals/${id}/proxy-configuration`, { signal }),
 };

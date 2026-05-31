@@ -1,10 +1,7 @@
 "use client";
 
 import { useTenant } from "@/hooks/use-tenant";
-import { useAppDashboard } from "@/hooks/use-applications";
 import { MetricCard } from "@/components/shared/metric-card";
-import { DonutChart } from "@/components/charts/donut-chart";
-import { LineChart } from "@/components/charts/line-chart";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,7 +22,6 @@ import { motion } from "framer-motion";
 export default function DashboardPage() {
   const router = useRouter();
   const { data: tenant, isLoading: tenantLoading, error: tenantError, refetch: refetchTenant } = useTenant();
-  const { data: dashboard, isLoading: dashLoading } = useAppDashboard();
 
   if (tenantLoading) {
     return <DashboardSkeleton />;
@@ -135,49 +131,6 @@ export default function DashboardPage() {
           accentColor="indigo"
         />
       </motion.div>
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-foreground">Application Health</h3>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {dashLoading ? (
-                <Skeleton className="h-[300px] w-full rounded-lg" />
-              ) : (
-                <DonutChart data={dashboard?.healthDistribution ?? []} />
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card>
-            <CardHeader>
-              <h3 className="text-sm font-semibold text-foreground">30-Day Sign-In Activity</h3>
-            </CardHeader>
-            <CardContent>
-              {dashLoading ? (
-                <Skeleton className="h-[300px] w-full rounded-lg" />
-              ) : (
-                <LineChart data={dashboard?.signInTrend ?? []} />
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
 
       {/* Tenant Info / Diagnostics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">

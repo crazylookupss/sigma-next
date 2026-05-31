@@ -151,3 +151,23 @@ export function useServicePrincipalSsoConfig(id: string) {
     retry: 1,
   });
 }
+
+export function useProtocolAnalysis(id: string) {
+  return useQuery({
+    queryKey: ["service-principals", id, "protocol-analysis"],
+    queryFn: ({ signal }) => applicationService.getProtocolAnalysis(id, signal),
+    staleTime: 2 * 60 * 1000,
+    enabled: !!id,
+    retry: 1,
+  });
+}
+
+export function useProxyConfiguration(id: string) {
+  return useQuery({
+    queryKey: ["service-principals", id, "proxy-configuration"],
+    queryFn: ({ signal }) => applicationService.getProxyConfiguration(id, signal),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!id,
+    retry: 1,
+  });
+}

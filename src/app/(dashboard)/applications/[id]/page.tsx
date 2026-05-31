@@ -6,6 +6,8 @@ import {
   useServicePrincipalOwners,
   useServicePrincipalAssignments,
   useServicePrincipalSsoConfig,
+  useProtocolAnalysis,
+  useProxyConfiguration,
 } from "@/hooks/use-applications";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +57,8 @@ export default function ApplicationDetailPage() {
   const { data: owners = [], isLoading: ownersLoading } = useServicePrincipalOwners(appIdOrId);
   const { data: assignments = [], isLoading: assignmentsLoading } = useServicePrincipalAssignments(appIdOrId);
   const { data: ssoConfig, isLoading: ssoConfigLoading } = useServicePrincipalSsoConfig(appIdOrId);
+  const { data: protocolAnalysis, isLoading: protocolAnalysisLoading, error: protocolError, refetch: refetchProtocol } = useProtocolAnalysis(appIdOrId);
+  const { data: proxyConfig, isLoading: proxyConfigLoading } = useProxyConfiguration(appIdOrId);
 
   // UI state
   const [activeTab, setActiveTab] = useState<TabId>("overview");
@@ -285,7 +289,7 @@ export default function ApplicationDetailPage() {
                       label="Preferred SSO Mode" 
                       value={
                         <Badge variant="success" className="capitalize text-[10px] bg-success/20 text-success border-success/30 font-semibold">
-                          {ssoConfig?.preferredSingleSignOnMode || "Not configured"}
+                          {ssoConfig?.isConfigured ? (ssoConfig.detectedPrimaryProtocol || ssoConfig.preferredSingleSignOnMode || "SSO Active") : "Not configured"}
                         </Badge>
                       } 
                     />
@@ -327,7 +331,7 @@ export default function ApplicationDetailPage() {
                     SSO & Integration Security
                   </CardHeader>
                   <CardContent className="space-y-1.5 py-4">
-                    <OverviewField label="Active Mode" value={ssoConfig?.preferredSingleSignOnMode ? `${ssoConfig.preferredSingleSignOnMode.toUpperCase()} Federated` : "Not configured"} />
+                    <OverviewField label="Active Mode" value={ssoConfig?.isConfigured ? `${(ssoConfig.detectedPrimaryProtocol || ssoConfig.preferredSingleSignOnMode || "SSO").toUpperCase()} Federated` : "Not configured"} />
                     <OverviewField label="Direct Assignments" value={assignments.length.toString()} />
                     <OverviewField label="Active Credentials" value={((sp.keyCredentials?.length ?? 0) + (sp.passwordCredentials?.length ?? 0)).toString()} />
                     <OverviewField label="SAML Metadata URL" value={(ssoConfig?.preferredSingleSignOnMode?.toLowerCase() === "saml") ? (ssoConfig?.samlMetadataUrl || "Available") : "—"} />
@@ -342,16 +346,22 @@ export default function ApplicationDetailPage() {
                   <CardContent className="space-y-3 py-4 text-xs">
                     <div className="flex items-center justify-between pb-2 border-b border-border/50">
                       <span className="text-muted-foreground">Tunnel Status</span>
-                      <div className="flex items-center gap-1.5">
-                        <div className="relative w-2 h-2">
-                          <div className="w-2 h-2 rounded-full bg-success" />
-                          <div className="absolute inset-0 w-2 h-2 rounded-full bg-success animate-ping opacity-40" />
+                      {proxyConfigLoading ? (
+                        <Skeleton className="h-4 w-16" />
+                      ) : proxyConfig?.isConfigured ? (
+                        <div className="flex items-center gap-1.5">
+                          <div className="relative w-2 h-2">
+                            <div className="w-2 h-2 rounded-full bg-success" />
+                            <div className="absolute inset-0 w-2 h-2 rounded-full bg-success animate-ping opacity-40" />
+                          </div>
+                          <span className="text-[10px] font-bold text-success">CONFIGURED</span>
                         </div>
-                        <span className="text-[10px] font-bold text-success">ONLINE</span>
-                      </div>
+                      ) : (
+                        <span className="text-[10px] font-bold text-muted-foreground">NOT CONFIGURED</span>
+                      )}
                     </div>
-                    <OverviewField label="Internal Routing" value="http://internal-app.local/" mono />
-                    <OverviewField label="External Proxy URL" value={`https://sigmaops-${sp.displayName?.toLowerCase().replace(/\s+/g, "-") || "app"}.msappproxy.net/`} mono />
+                    <OverviewField label="Internal Routing" value={proxyConfig?.internalUrl || "—"} mono />
+                    <OverviewField label="External Proxy URL" value={proxyConfig?.externalUrl || "—"} mono />
                   </CardContent>
                 </Card>
               </div>
@@ -425,7 +435,7 @@ export default function ApplicationDetailPage() {
                   <OverviewField label="Service Principal Type" value={sp.servicePrincipalType} />
                   <OverviewField label="Sign-In Audience" value={sp.signInAudience || "AzureADMyOrg"} />
                   <OverviewField label="User Assignment Required" value={sp.appRoleAssignmentRequired ? "Yes (Only assigned users can sign in)" : "No (All directory users can sign in)"} />
-                    <OverviewField label="Default Preferred SSO Mode" value={ssoConfig?.preferredSingleSignOnMode ? `${ssoConfig.preferredSingleSignOnMode.toUpperCase()} Federation` : "Not configured"} />
+                    <OverviewField label="Default Preferred SSO Mode" value={ssoConfig?.isConfigured ? `${(ssoConfig.detectedPrimaryProtocol || ssoConfig.preferredSingleSignOnMode || "SSO").toUpperCase()} Federation` : "Not configured"} />
                   <OverviewField label="App Owner Tenant ID" value={sp.appOwnerOrganizationId || "—"} mono />
                   <OverviewField label="Created Timestamp" value={formatDate(sp.createdDateTime)} />
                 </CardContent>
@@ -615,9 +625,9 @@ export default function ApplicationDetailPage() {
                   <span className="text-foreground font-semibold text-xs">Federated Single Sign-On (SSO) Status</span>
                   <p className="text-[10px] text-muted-foreground mt-0.5 font-normal">Configure and audit authentication handshake properties and SAML trust certificates.</p>
                 </div>
-                <Badge variant="success" className="text-xs py-1 px-3 uppercase bg-success/20 text-success border-success/30 font-semibold">
-                  {ssoConfigLoading ? "Loading..." : ssoConfig?.preferredSingleSignOnMode
-                    ? `${ssoConfig.preferredSingleSignOnMode.toUpperCase()} Configured`
+                <Badge variant={ssoConfig?.isConfigured ? "success" : "secondary"} className="text-xs py-1 px-3 uppercase font-semibold">
+                  {ssoConfigLoading ? "Loading..." : ssoConfig?.isConfigured
+                    ? `${ssoConfig.detectedPrimaryProtocol || ssoConfig.preferredSingleSignOnMode?.toUpperCase() || "SSO"} Active`
                     : "Not Configured"}
                 </Badge>
               </CardHeader>
@@ -637,22 +647,25 @@ export default function ApplicationDetailPage() {
                     );
                   }
 
-                  // Not configured
-                  if (!mode || mode === "notconfigured") {
+                  // Not configured - only show when truly no SSO data exists
+                  if (!ssoConfig?.isConfigured) {
                     return (
                       <div className="flex flex-col items-center justify-center py-16">
                         <Key className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                        <p className="text-sm font-semibold text-foreground">No SSO Protocol Configured</p>
+                        <p className="text-sm font-semibold text-foreground">No SSO Configuration Found</p>
                         <p className="text-xs text-muted-foreground mt-1 max-w-md text-center">
-                          This enterprise application does not have a single sign-on protocol configured in Entra ID.
-                          Configure SAML or OIDC in the App Registration to enable SSO.
+                          This enterprise application does not have SSO configuration data.
+                          No certificates, metadata URLs, or protocol settings were detected.
                         </p>
                       </div>
                     );
                   }
 
+                  // Use detected protocol or fall back to preferredSingleSignOnMode
+                  const protocol = ssoConfig?.detectedPrimaryProtocol?.toLowerCase() || mode;
+
                   // SAML
-                  if (mode === "saml") {
+                  if (protocol === "saml") {
                     return (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -686,7 +699,7 @@ export default function ApplicationDetailPage() {
                             <div className="rounded-xl border border-border bg-accent/10 p-5 space-y-4">
                               <div className="flex items-center justify-between pb-2 border-b border-border/20">
                                 <h4 className="text-xs font-bold text-foreground">2. Attributes & Claims</h4>
-                                <Badge variant="outline" className="text-[9px] font-mono">Configured</Badge>
+                                <Badge variant="outline" className="text-[9px] font-mono">{ssoConfig?.samlClaims?.length ?? 0} Claims</Badge>
                               </div>
                               <p className="text-[10px] text-muted-foreground leading-relaxed">
                                 These claims will be sent in the SAML token issued by Microsoft Entra ID to the application.
@@ -700,29 +713,55 @@ export default function ApplicationDetailPage() {
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-border/60 font-medium">
-                                    <tr className="hover:bg-accent/10">
-                                      <td className="py-2.5 px-3 text-foreground font-mono">givenname</td>
-                                      <td className="py-2.5 px-3 text-muted-foreground font-mono">user.givenname</td>
-                                    </tr>
-                                    <tr className="hover:bg-accent/10">
-                                      <td className="py-2.5 px-3 text-foreground font-mono">surname</td>
-                                      <td className="py-2.5 px-3 text-muted-foreground font-mono">user.surname</td>
-                                    </tr>
-                                    <tr className="hover:bg-accent/10">
-                                      <td className="py-2.5 px-3 text-foreground font-mono">emailaddress</td>
-                                      <td className="py-2.5 px-3 text-muted-foreground font-mono">user.mail</td>
-                                    </tr>
-                                    <tr className="hover:bg-accent/10">
-                                      <td className="py-2.5 px-3 text-foreground font-mono">name</td>
-                                      <td className="py-2.5 px-3 text-muted-foreground font-mono">user.userprincipalname</td>
-                                    </tr>
-                                    <tr className="hover:bg-accent/10">
-                                      <td className="py-2.5 px-3 text-foreground font-semibold">Unique User Identifier</td>
-                                      <td className="py-2.5 px-3 text-primary font-mono">user.userprincipalname</td>
-                                    </tr>
+                                    {ssoConfig?.samlClaims && ssoConfig.samlClaims.length > 0 ? (
+                                      ssoConfig.samlClaims.map((claim, idx) => (
+                                        <tr key={idx} className="hover:bg-accent/10">
+                                          <td className="py-2.5 px-3 text-foreground font-mono">{claim.namespace || claim.name.split('/').pop()}</td>
+                                          <td className="py-2.5 px-3 text-muted-foreground font-mono">{claim.value}</td>
+                                        </tr>
+                                      ))
+                                    ) : (
+                                      <>
+                                        <tr className="hover:bg-accent/10">
+                                          <td className="py-2.5 px-3 text-foreground font-mono">givenname</td>
+                                          <td className="py-2.5 px-3 text-muted-foreground font-mono">user.givenname</td>
+                                        </tr>
+                                        <tr className="hover:bg-accent/10">
+                                          <td className="py-2.5 px-3 text-foreground font-mono">surname</td>
+                                          <td className="py-2.5 px-3 text-muted-foreground font-mono">user.surname</td>
+                                        </tr>
+                                        <tr className="hover:bg-accent/10">
+                                          <td className="py-2.5 px-3 text-foreground font-mono">emailaddress</td>
+                                          <td className="py-2.5 px-3 text-muted-foreground font-mono">user.mail</td>
+                                        </tr>
+                                        <tr className="hover:bg-accent/10">
+                                          <td className="py-2.5 px-3 text-foreground font-mono">name</td>
+                                          <td className="py-2.5 px-3 text-muted-foreground font-mono">user.userprincipalname</td>
+                                        </tr>
+                                        <tr className="hover:bg-accent/10">
+                                          <td className="py-2.5 px-3 text-foreground font-semibold">Unique User Identifier</td>
+                                          <td className="py-2.5 px-3 text-primary font-mono">user.userprincipalname</td>
+                                        </tr>
+                                      </>
+                                    )}
                                   </tbody>
                                 </table>
                               </div>
+
+                              {/* Group Membership Claims */}
+                              {ssoConfig?.groupMembershipClaims && (
+                                <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                                  <span className="text-[10px] font-semibold text-primary">Group Membership Claims: {ssoConfig.groupMembershipClaims}</span>
+                                </div>
+                              )}
+
+                              {/* Optional Claims */}
+                              {ssoConfig?.optionalClaims && ssoConfig.optionalClaims.length > 0 && (
+                                <div className="mt-3">
+                                  <span className="text-[10px] font-semibold text-foreground">Optional Claims: </span>
+                                  <span className="text-[10px] text-muted-foreground">{ssoConfig.optionalClaims.join(', ')}</span>
+                                </div>
+                              )}
                             </div>
 
                             <div className="rounded-xl border border-border bg-accent/10 p-5 space-y-4">
@@ -828,7 +867,7 @@ export default function ApplicationDetailPage() {
                   }
 
                   // OIDC
-                  if (mode === "oidc") {
+                  if (protocol === "oidc") {
                     return (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -901,7 +940,7 @@ export default function ApplicationDetailPage() {
                                 { name: "Authorization Code", enabled: true },
                                 { name: "PKCE (Recommended)", enabled: true },
                                 { name: "Client Credentials", enabled: true },
-                                { name: "Implicit Flow", enabled: false },
+                                { name: "Implicit Flow", enabled: ssoConfig?.enableIdTokenIssuance === true || ssoConfig?.enableAccessTokenIssuance === true },
                                 { name: "Device Code", enabled: false },
                               ].map((grant) => (
                                 <div key={grant.name} className="flex items-center justify-between text-[10px]">
@@ -919,7 +958,7 @@ export default function ApplicationDetailPage() {
                   }
 
                   // Password
-                  if (mode === "password") {
+                  if (protocol === "password") {
                     return (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                         <div className="rounded-xl border border-border bg-accent/10 p-5 space-y-4">
@@ -936,7 +975,7 @@ export default function ApplicationDetailPage() {
                   }
 
                   // Headers
-                  if (mode === "headers") {
+                  if (protocol === "headers" || protocol === "headerbased") {
                     return (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                         <div className="rounded-xl border border-border bg-accent/10 p-5 space-y-4">
@@ -953,7 +992,7 @@ export default function ApplicationDetailPage() {
                   }
 
                   // Linked
-                  if (mode === "linked") {
+                  if (protocol === "linked") {
                     return (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                         <div className="rounded-xl border border-border bg-accent/10 p-5 space-y-4">
@@ -982,6 +1021,161 @@ export default function ApplicationDetailPage() {
             </Card>
           )}
 
+          {/* Protocol Analysis Section */}
+          {activeTab === "sso" && (
+            <Card>
+              <CardHeader className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 py-3 border-b border-border/20">
+                <div>
+                  <span className="text-foreground font-semibold text-xs">Protocol Intelligence Analysis</span>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 font-normal">Automated detection of authentication protocols based on SSO configuration.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {protocolAnalysis?.primaryProtocol && protocolAnalysis.primaryProtocol !== "Unknown" && (
+                    <Badge variant="success" className="text-xs py-1 px-3 uppercase font-semibold">
+                      {protocolAnalysis.primaryProtocol}
+                    </Badge>
+                  )}
+                  <button
+                    onClick={() => refetchProtocol()}
+                    disabled={protocolAnalysisLoading}
+                    className="p-1.5 rounded-md hover:bg-accent/50 transition-colors disabled:opacity-50"
+                    title="Refresh analysis"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 text-muted-foreground ${protocolAnalysisLoading ? 'animate-spin' : ''}`} />
+                  </button>
+                </div>
+              </CardHeader>
+              <CardContent className="py-6 space-y-6">
+                {protocolAnalysisLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <Fingerprint className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3 animate-pulse" />
+                      <Skeleton className="h-4 w-48 mx-auto" />
+                      <Skeleton className="h-3 w-32 mx-auto mt-2" />
+                    </div>
+                  </div>
+                ) : protocolError ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <AlertTriangle className="w-12 h-12 text-warning/50 mx-auto mb-4" />
+                    <p className="text-sm font-semibold text-foreground">Analysis Failed</p>
+                    <p className="text-xs text-muted-foreground mt-1">Unable to load protocol analysis. Check backend connectivity.</p>
+                    <button onClick={() => refetchProtocol()} className="mt-3 text-xs text-primary hover:underline">Retry</button>
+                  </div>
+                ) : !protocolAnalysis ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Fingerprint className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-sm font-semibold text-foreground">Analysis Not Available</p>
+                    <p className="text-xs text-muted-foreground mt-1">Protocol analysis data is not available for this application.</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Primary Protocol Card */}
+                    {protocolAnalysis.primaryProtocol && protocolAnalysis.primaryProtocol !== "Unknown" && (
+                      <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <Shield className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-bold text-foreground">Primary: {protocolAnalysis.primaryProtocol}</h4>
+                              <p className="text-[10px] text-muted-foreground">Detected as the main authentication protocol</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-lg font-bold text-primary">
+                              {protocolAnalysis.detectedProtocols.find(d => d.protocol === protocolAnalysis.primaryProtocol)?.normalizedScore || 0}%
+                            </span>
+                            <p className="text-[9px] text-muted-foreground">confidence</p>
+                          </div>
+                        </div>
+                        <div className="w-full bg-primary/10 rounded-full h-2">
+                          <div
+                            className="h-2 rounded-full bg-primary transition-all duration-500"
+                            style={{ width: `${protocolAnalysis.detectedProtocols.find(d => d.protocol === protocolAnalysis.primaryProtocol)?.normalizedScore || 0}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Other Detected Protocols */}
+                    {protocolAnalysis.detectedProtocols.filter(d => d.isDetected && d.protocol !== protocolAnalysis.primaryProtocol).length > 0 && (
+                      <div>
+                        <p className="text-[10px] text-muted-foreground mb-2">Also detected:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {protocolAnalysis.detectedProtocols
+                            .filter(d => d.isDetected && d.protocol !== protocolAnalysis.primaryProtocol)
+                            .map((detection) => (
+                              <div key={detection.protocol} className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/30 bg-accent/30 text-xs">
+                                <span className="font-medium text-foreground">{detection.protocol}</span>
+                                <span className="text-muted-foreground">({detection.normalizedScore}%)</span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Evidence Summary - Only show for primary protocol */}
+                    {protocolAnalysis.detectedProtocols.find(d => d.protocol === protocolAnalysis.primaryProtocol)?.evidence && (
+                      <div>
+                        <p className="text-[10px] text-muted-foreground mb-2">Evidence supporting {protocolAnalysis.primaryProtocol} detection:</p>
+                        <div className="max-h-32 overflow-y-auto space-y-1 pr-2">
+                          {protocolAnalysis.detectedProtocols
+                            .find(d => d.protocol === protocolAnalysis.primaryProtocol)!
+                            .evidence.slice(0, 8)
+                            .map((evidence, idx) => (
+                              <div key={idx} className="flex items-center gap-2 text-[10px] py-1 px-2 rounded bg-accent/20">
+                                <span className="text-muted-foreground">•</span>
+                                <span className="text-foreground/80">{evidence.description}</span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Governance Insights */}
+                    {protocolAnalysis.governanceInsights.length > 0 && (
+                      <div>
+                        <p className="text-[10px] text-muted-foreground mb-2">Governance findings:</p>
+                        <div className="space-y-2">
+                          {protocolAnalysis.governanceInsights.map((insight, idx) => (
+                            <div
+                              key={idx}
+                              className={`p-3 rounded-lg border text-xs ${
+                                insight.severity === "Critical"
+                                  ? "border-error/50 bg-error/5 text-error"
+                                  : insight.severity === "Warning"
+                                  ? "border-warning/50 bg-warning/5 text-warning"
+                                  : "border-info/50 bg-info/5 text-info"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge
+                                  variant={insight.severity === "Critical" ? "danger" : insight.severity === "Warning" ? "warning" : "secondary"}
+                                  className="text-[8px] py-0 px-1"
+                                >
+                                  {insight.severity}
+                                </Badge>
+                                <span className="text-[9px] text-muted-foreground">{insight.category}</span>
+                              </div>
+                              <p className="text-[10px]">{insight.message}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Analysis Metadata */}
+                    <div className="flex items-center justify-between text-[9px] text-muted-foreground pt-2 border-t border-border/20">
+                      <span>Analyzed: {new Date(protocolAnalysis.analysisTimestamp).toLocaleString()}</span>
+                      <span>{protocolAnalysis.allEvidence.length} evidence signals across {protocolAnalysis.detectedProtocols.filter(d => d.isDetected).length} protocols</span>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Application Proxy Tab */}
           {activeTab === "proxy" && (
             <Card>
@@ -990,48 +1184,76 @@ export default function ApplicationDetailPage() {
                   <span className="text-foreground font-semibold text-xs">Microsoft Entra Application Proxy Manager</span>
                   <p className="text-[10px] text-muted-foreground mt-0.5 font-normal">Securely publish on-premises web applications to external clients using secure proxy tunnels.</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="relative flex items-center justify-center w-2.5 h-2.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-success" />
-                    <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-success animate-ping opacity-40" />
+                {proxyConfigLoading ? (
+                  <Badge variant="secondary" className="text-xs py-1 px-3">Loading...</Badge>
+                ) : proxyConfig?.isConfigured ? (
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex items-center justify-center w-2.5 h-2.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-success" />
+                      <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-success animate-ping opacity-40" />
+                    </div>
+                    <span className="text-xs font-bold text-success tracking-wider">CONFIGURED</span>
                   </div>
-                  <span className="text-xs font-bold text-success tracking-wider">ONLINE</span>
-                </div>
+                ) : (
+                  <Badge variant="secondary" className="text-xs py-1 px-3 uppercase">Not Configured</Badge>
+                )}
               </CardHeader>
               <CardContent className="py-6 space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  
-                  {/* Left Column URL Mappings */}
-                  <div className="p-5 rounded-xl border border-border bg-accent/10 space-y-4">
-                    <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                      <Globe className="w-4 h-4 text-primary" />
-                      URL Routing Endpoints
-                    </h4>
-                    <OverviewField label="Internal URL" value="http://internal-app.local/" mono copyable onCopy={() => copyToClipboard("http://internal-app.local/", "Internal URL")} />
-                    <OverviewField label="External URL" value={`https://sigmaops-${sp.displayName?.toLowerCase().replace(/\s+/g, "-") || "app"}.msappproxy.net/`} mono copyable onCopy={() => copyToClipboard(`https://sigmaops-${sp.displayName?.toLowerCase().replace(/\s+/g, "-") || "app"}.msappproxy.net/`, "External URL")} />
-                  </div>
-
-                  {/* Right Column settings */}
-                  <div className="p-5 rounded-xl border border-border bg-accent/10 space-y-4">
-                    <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                      <Settings className="w-4 h-4 text-amber-500" />
-                      Proxy Configuration Settings
-                    </h4>
-                    <div className="flex items-center justify-between pb-2 border-b border-border/50 text-xs">
-                      <span className="text-muted-foreground">Pre-Authentication</span>
-                      <Badge variant="default" className="bg-primary/20 text-primary border-primary/30 text-[10px]">Microsoft Entra ID</Badge>
-                    </div>
-                    <div className="flex items-center justify-between pb-2 border-b border-border/50 text-xs">
-                      <span className="text-muted-foreground">Connector Group</span>
-                      <span className="font-semibold text-foreground">Default Connector Group</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Translate Body URLs</span>
-                      <Badge variant="secondary" className="text-[10px]">Enabled</Badge>
+                {proxyConfigLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <Network className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3 animate-pulse" />
+                      <Skeleton className="h-4 w-48 mx-auto" />
                     </div>
                   </div>
+                ) : !proxyConfig?.isConfigured ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Network className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-sm font-semibold text-foreground">Application Proxy Not Configured</p>
+                    <p className="text-xs text-muted-foreground mt-1 max-w-md text-center">
+                      This enterprise application does not have Application Proxy configured.
+                      Configure proxy in the Entra admin center to publish on-premises applications.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Left Column URL Mappings */}
+                    <div className="p-5 rounded-xl border border-border bg-accent/10 space-y-4">
+                      <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <Globe className="w-4 h-4 text-primary" />
+                        URL Routing Endpoints
+                      </h4>
+                      <OverviewField label="Internal URL" value={proxyConfig.internalUrl || "Not configured"} mono copyable={!!proxyConfig.internalUrl} onCopy={proxyConfig.internalUrl ? () => copyToClipboard(proxyConfig.internalUrl!, "Internal URL") : undefined} />
+                      <OverviewField label="External URL" value={proxyConfig.externalUrl || "Not configured"} mono copyable={!!proxyConfig.externalUrl} onCopy={proxyConfig.externalUrl ? () => copyToClipboard(proxyConfig.externalUrl!, "External URL") : undefined} />
+                    </div>
 
-                </div>
+                    {/* Right Column settings */}
+                    <div className="p-5 rounded-xl border border-border bg-accent/10 space-y-4">
+                      <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <Settings className="w-4 h-4 text-amber-500" />
+                        Proxy Configuration Settings
+                      </h4>
+                      <div className="flex items-center justify-between pb-2 border-b border-border/50 text-xs">
+                        <span className="text-muted-foreground">Pre-Authentication</span>
+                        <Badge variant={proxyConfig.preAuthentication === "AzureAD" ? "default" : "secondary"} className={proxyConfig.preAuthentication === "AzureAD" ? "bg-primary/20 text-primary border-primary/30 text-[10px]" : "text-[10px]"}>
+                          {proxyConfig.preAuthentication || "Not set"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between pb-2 border-b border-border/50 text-xs">
+                        <span className="text-muted-foreground">Translate URLs in Body</span>
+                        <Badge variant={proxyConfig.translateUrlsInBody ? "success" : "secondary"} className="text-[10px]">
+                          {proxyConfig.translateUrlsInBody ? "Enabled" : "Disabled"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Verify Domain Certificates</span>
+                        <Badge variant={proxyConfig.verifyDomainCertificates ? "success" : "secondary"} className="text-[10px]">
+                          {proxyConfig.verifyDomainCertificates ? "Enabled" : "Disabled"}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
