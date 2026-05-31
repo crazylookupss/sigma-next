@@ -20,7 +20,6 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
 
   const filteredUsers = useMemo(() => {
-    console.log("[SIGMA] usersData received:", data);
     if (!data) return [];
 
     let list: any[] = [];
@@ -33,8 +32,6 @@ export default function UsersPage() {
         list = (data as any).data.data;
       }
     }
-
-    console.log("[SIGMA] Resolved users list:", list);
 
     if (!search.trim()) return list;
     const q = search.toLowerCase();

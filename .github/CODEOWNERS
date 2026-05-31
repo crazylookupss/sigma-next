@@ -1,0 +1,17 @@
+# SIGMA Web Client Code Owners
+# These owners will be automatically requested for review
+# when a pull request modifies matching files.
+
+# Default owner for everything
+* @crazylookupss
+
+# Source code
+src/app/ @crazylookupss
+src/components/ @crazylookupss
+src/hooks/ @crazylookupss
+src/services/ @crazylookupss
+src/providers/ @crazylookupss
+src/types/ @crazylookupss
+
+# Documentation
+docs/ @crazylookupss

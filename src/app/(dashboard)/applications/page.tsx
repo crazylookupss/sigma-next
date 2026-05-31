@@ -29,7 +29,6 @@ export default function ApplicationsPage() {
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
-    console.log("[SIGMA] spData received:", spData);
     if (!spData) return [];
 
     let list: any[] = [];
@@ -42,8 +41,6 @@ export default function ApplicationsPage() {
         list = (spData as any).data.data;
       }
     }
-
-    console.log("[SIGMA] Resolved enterprise applications list:", list);
 
     if (!search.trim()) return list;
     const q = search.toLowerCase();

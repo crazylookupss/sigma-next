@@ -20,7 +20,6 @@ export default function AppRegistrationsPage() {
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
-    console.log("[SIGMA] appRegistrationsData received:", data);
     if (!data) return [];
 
     let list: any[] = [];
@@ -33,8 +32,6 @@ export default function AppRegistrationsPage() {
         list = (data as any).data.data;
       }
     }
-
-    console.log("[SIGMA] Resolved app registrations list:", list);
 
     if (!search.trim()) return list;
     const q = search.toLowerCase();
