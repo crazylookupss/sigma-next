@@ -19,29 +19,31 @@ import {
   XCircle,
 } from "lucide-react";
 import type { EntraServicePrincipal } from "@/types/application";
+import type { PagedResponse } from "@/types/common";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+function extractServicePrincipals(data: PagedResponse<EntraServicePrincipal> | EntraServicePrincipal[] | unknown): EntraServicePrincipal[] {
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === "object") {
+    const obj = data as Record<string, unknown>;
+    if (Array.isArray(obj.data)) return obj.data as EntraServicePrincipal[];
+    if (obj.data && typeof obj.data === "object") {
+      const nested = obj.data as Record<string, unknown>;
+      if (Array.isArray(nested.data)) return nested.data as EntraServicePrincipal[];
+    }
+  }
+  return [];
+}
 
 export default function ApplicationsPage() {
   const router = useRouter();
   const { data: spData, isLoading, error, refetch, isFetching } = useServicePrincipals();
-  const { data: dashboard, isLoading: dashLoading } = useAppDashboard();
+  const { data: dashboard } = useAppDashboard();
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
-    if (!spData) return [];
-
-    let list: any[] = [];
-    if (Array.isArray(spData)) {
-      list = spData;
-    } else if (spData && typeof spData === "object") {
-      if (Array.isArray((spData as any).data)) {
-        list = (spData as any).data;
-      } else if ((spData as any).data && typeof (spData as any).data === "object" && Array.isArray((spData as any).data.data)) {
-        list = (spData as any).data.data;
-      }
-    }
-
+    const list = extractServicePrincipals(spData);
     if (!search.trim()) return list;
     const q = search.toLowerCase();
     return list.filter(

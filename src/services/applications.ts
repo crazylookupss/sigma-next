@@ -18,6 +18,25 @@ import type {
   ServicePrincipalProxyConfig,
 } from "@/types/application";
 
+interface DashboardStatusStat {
+  status: string;
+  count: number;
+}
+
+interface DashboardSignInHistory {
+  date: string;
+  count: number;
+}
+
+interface DashboardResponse {
+  totalApplications: number;
+  activeCount: number;
+  warningCount: number;
+  errorCount: number;
+  statusStats: DashboardStatusStat[];
+  signInsHistory: DashboardSignInHistory[];
+}
+
 export const applicationService = {
   getApplications: (signal?: AbortSignal) =>
     fetchApi<PagedResponse<EntraApplication>>("/applications", { signal }),
@@ -32,18 +51,18 @@ export const applicationService = {
     fetchApi<EntraServicePrincipal>(`/service-principals/${id}`, { signal }),
 
   getDashboard: async (signal?: AbortSignal): Promise<AppStatistics> => {
-    const res = await fetchApi<any>("/service-principals/dashboard", { signal });
+    const res = await fetchApi<DashboardResponse>("/service-principals/dashboard", { signal });
     return {
       totalApps: res.totalApplications ?? 0,
       activeCount: res.activeCount ?? 0,
       warningCount: res.warningCount ?? 0,
       expiredCount: res.errorCount ?? 0,
-      healthDistribution: (res.statusStats ?? []).map((s: any) => ({
+      healthDistribution: (res.statusStats ?? []).map((s: DashboardStatusStat) => ({
         name: s.status,
         value: s.count,
         color: s.status === "Active" ? "#10b981" : s.status === "Warning" ? "#f59e0b" : "#ef4444",
       })),
-      signInTrend: (res.signInsHistory ?? []).map((s: any) => ({
+      signInTrend: (res.signInsHistory ?? []).map((s: DashboardSignInHistory) => ({
         date: s.date,
         count: s.count,
       })),
@@ -73,7 +92,7 @@ export const applicationService = {
     fetchApi<AuditLogEntryDto[]>(`/applications/${id}/audit-logs`, { signal }),
 
   getManifest: (id: string, signal?: AbortSignal) =>
-    fetchApi<any>(`/applications/${id}/manifest`, { signal }),
+    fetchApi<Record<string, unknown>>(`/applications/${id}/manifest`, { signal }),
 
   // Service Principal details endpoints
   getServicePrincipalOwners: (id: string, signal?: AbortSignal) =>

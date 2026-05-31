@@ -154,13 +154,13 @@ export function getSignalRConnection(): HubConnection {
 // Entity-update subscription
 // ---------------------------------------------------------------------------
 export function onEntityUpdate(
-  callback: (eventType: string, data: any) => void
+  callback: (eventType: string, data: Record<string, unknown>) => void
 ) {
   const conn = getSignalRConnection();
   conn.off("entityUpdated");
   conn.on(
     "entityUpdated",
-    (payload: { type: string; data: any; timestamp: string }) => {
+    (payload: { type: string; data: Record<string, unknown>; timestamp: string }) => {
       callback(payload.type, payload.data);
     }
   );

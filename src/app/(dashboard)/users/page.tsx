@@ -10,9 +10,23 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RefreshCw, Search, Users as UsersIcon } from "lucide-react";
 import type { SigmaUserDto } from "@/types/user";
+import type { PagedResponse } from "@/types/common";
 import { getInitials } from "@/lib/utils";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+function extractUsers(data: PagedResponse<SigmaUserDto> | SigmaUserDto[] | unknown): SigmaUserDto[] {
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === "object") {
+    const obj = data as Record<string, unknown>;
+    if (Array.isArray(obj.data)) return obj.data as SigmaUserDto[];
+    if (obj.data && typeof obj.data === "object") {
+      const nested = obj.data as Record<string, unknown>;
+      if (Array.isArray(nested.data)) return nested.data as SigmaUserDto[];
+    }
+  }
+  return [];
+}
 
 export default function UsersPage() {
   const router = useRouter();
@@ -20,19 +34,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
 
   const filteredUsers = useMemo(() => {
-    if (!data) return [];
-
-    let list: any[] = [];
-    if (Array.isArray(data)) {
-      list = data;
-    } else if (data && typeof data === "object") {
-      if (Array.isArray((data as any).data)) {
-        list = (data as any).data;
-      } else if ((data as any).data && typeof (data as any).data === "object" && Array.isArray((data as any).data.data)) {
-        list = (data as any).data.data;
-      }
-    }
-
+    const list = extractUsers(data);
     if (!search.trim()) return list;
     const q = search.toLowerCase();
     return list.filter(

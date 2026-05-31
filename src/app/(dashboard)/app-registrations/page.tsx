@@ -10,9 +10,23 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RefreshCw, Search, Code2 } from "lucide-react";
 import type { EntraApplication } from "@/types/application";
+import type { PagedResponse } from "@/types/common";
 import { formatDate } from "@/lib/utils";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+function extractApplications(data: PagedResponse<EntraApplication> | EntraApplication[] | unknown): EntraApplication[] {
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === "object") {
+    const obj = data as Record<string, unknown>;
+    if (Array.isArray(obj.data)) return obj.data as EntraApplication[];
+    if (obj.data && typeof obj.data === "object") {
+      const nested = obj.data as Record<string, unknown>;
+      if (Array.isArray(nested.data)) return nested.data as EntraApplication[];
+    }
+  }
+  return [];
+}
 
 export default function AppRegistrationsPage() {
   const router = useRouter();
@@ -20,19 +34,7 @@ export default function AppRegistrationsPage() {
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
-    if (!data) return [];
-
-    let list: any[] = [];
-    if (Array.isArray(data)) {
-      list = data;
-    } else if (data && typeof data === "object") {
-      if (Array.isArray((data as any).data)) {
-        list = (data as any).data;
-      } else if ((data as any).data && typeof (data as any).data === "object" && Array.isArray((data as any).data.data)) {
-        list = (data as any).data.data;
-      }
-    }
-
+    const list = extractApplications(data);
     if (!search.trim()) return list;
     const q = search.toLowerCase();
     return list.filter(
