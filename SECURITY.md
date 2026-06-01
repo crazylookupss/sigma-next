@@ -2,9 +2,11 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in SIGMA Web Client, please report it privately by contacting the maintainers directly or opening a GitHub Security Advisory.
+If you discover a security vulnerability in SIGMA Web Client, please report it privately.
 
 **Do not** report security vulnerabilities through public GitHub issues.
+
+Please send an email to **[YOUR_EMAIL_HERE]** with details of the vulnerability. We will work with you to resolve the issue promptly. Alternatively, you can open a private GitHub Security Advisory in this repository.
 
 ## Response Timeline
 

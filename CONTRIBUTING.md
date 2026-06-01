@@ -85,12 +85,21 @@ docs(readme): update environment configuration
 
 ## Pull Request Guidelines
 
-- Keep PRs focused on a single feature, refinement, or bug fix
-- Write descriptive commit messages following conventional commits
-- Document any new components, props, hooks, or configurations
-- Ensure your branch is synced with upstream `main` before submitting
-- Remove any `console.log` debug statements before submitting
-- Add screenshots for UI changes
+- **Keep PRs focused** on a single feature, refinement, or bug fix.
+- **Write descriptive commit messages** following the Conventional Commits specification.
+- **Ensure CI passes**: Your PR must pass all automated GitHub Actions checks (build, lint, type-check, and E2E tests).
+- **Vercel Previews**: If Vercel is configured, please verify your changes on the automatically generated preview deployment.
+- **Documentation**: Document any new components, props, hooks, or configurations.
+- **Code Hygiene**: Remove any `console.log` debug statements before submitting.
+- **Visuals**: Add screenshots or screen recordings for any UI changes.
+
+## First-Time Contributors
+
+If this is your first time contributing to open source, we recommend checking out these resources:
+- [Finding ways to contribute to open source on GitHub](https://docs.github.com/en/get-started/exploring-projects-on-github/finding-ways-to-contribute-to-open-source-on-github)
+- [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
+
+Look for issues labeled `good first issue` or `help wanted` to get started. Don't hesitate to ask questions in the issue comments!
 
 ## Reporting Issues
 
