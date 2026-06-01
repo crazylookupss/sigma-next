@@ -100,3 +100,14 @@ server {
     }
 }
 ```
+
+## CI/CD (GitHub Actions)
+
+The CI pipeline runs on every push to `main` and on pull requests:
+
+| Step | Description |
+|------|-------------|
+| TypeScript check | `npx tsc --noEmit` |
+| Lint | `npm run lint` |
+| Build | `npm run build` |
+| E2E tests | Playwright smoke tests (Chromium) |

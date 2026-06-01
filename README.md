@@ -206,6 +206,17 @@ The application uses a **Direct SignalR WebSocket Connection** for event-driven 
 
 ---
 
+## Testing
+
+```bash
+# E2E smoke tests (Playwright)
+npx playwright install chromium
+npm run build
+npm run test:e2e
+```
+
+---
+
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
