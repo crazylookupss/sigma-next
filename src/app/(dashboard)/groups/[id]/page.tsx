@@ -15,15 +15,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ArrowLeft, 
-  Users as UsersIcon, 
   ShieldAlert, 
-  RefreshCw,
   FolderOpen,
   Monitor,
-  History,
-  Lock,
-  ClipboardList,
-  Sliders,
   Award
 } from "lucide-react";
 import Link from "next/link";
@@ -35,7 +29,7 @@ export default function GroupDetailPage() {
   const id = params.id as string;
 
   // React Queries
-  const { data: group, isLoading: isGroupLoading, error: groupError, refetch: refetchGroup } = useGroup(id);
+  const { data: group, isLoading: isGroupLoading, error: groupError } = useGroup(id);
   const { data: members = [], isLoading: isMembersLoading } = useGroupMembers(id);
   const { data: owners = [], isLoading: isOwnersLoading } = useGroupOwners(id);
   const { data: apps = [], isLoading: isAppsLoading } = useGroupApplications(id);

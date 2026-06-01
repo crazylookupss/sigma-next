@@ -103,11 +103,7 @@ export function getSignalRConnection(): HubConnection {
 
   connection = new HubConnectionBuilder()
     .withUrl(getHubUrl(), {
-      // Direct WebSocket — skip the HTTP negotiate round-trip entirely.
-      // This avoids the "unexpected token <!DOCTYPE" error and reduces
-      // connection latency from ~300ms to ~50ms.
-      skipNegotiation: true,
-      transport: HttpTransportType.WebSockets,
+      transport: HttpTransportType.WebSockets | HttpTransportType.LongPolling,
       accessTokenFactory: async () => {
         const session = await getSession();
         return session?.accessToken ?? "";

@@ -2,7 +2,6 @@ import type { EntraTenant } from "@/types/tenant";
 import type { SigmaUserDto } from "@/types/user";
 import type { EntraGroup } from "@/types/group";
 import type { EntraServicePrincipal, AppStatistics } from "@/types/application";
-import type { PagedResponse } from "@/types/common";
 
 const firstNames = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank", "Ivy", "Jack", "Kara", "Leo", "Mona", "Nate", "Opal", "Pete", "Quinn", "Rosa", "Sam", "Tina"];
 const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"];
@@ -17,7 +16,7 @@ function randomDate(start: Date, end: Date): string {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
 }
 
-const mockUsers: SigmaUserDto[] = Array.from({ length: 247 }, (_, i) => {
+const mockUsers: SigmaUserDto[] = Array.from({ length: 247 }, () => {
   const first = randomItem(firstNames);
   const last = randomItem(lastNames);
   const domain = randomItem(domains);
@@ -67,7 +66,7 @@ const mockGroups: EntraGroup[] = Array.from({ length: 86 }, (_, i) => {
   };
 });
 
-const mockServicePrincipals: EntraServicePrincipal[] = Array.from({ length: 124 }, (_, i) => {
+const mockServicePrincipals: EntraServicePrincipal[] = Array.from({ length: 124 }, () => {
   const statuses = ["active", "active", "active", "active", "warning", "warning", "error"] as const;
   return {
     id: crypto.randomUUID(),

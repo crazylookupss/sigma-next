@@ -10,7 +10,6 @@ import {
   AppWindow,
   Code2,
   Shield,
-  AlertCircle,
   ChevronLeft,
 } from "lucide-react";
 import { useSidebarStore } from "@/stores/sidebar";

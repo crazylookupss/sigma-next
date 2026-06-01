@@ -4,7 +4,6 @@ import { useParams, useRouter } from "next/navigation";
 import {
   useApplication,
   useApplicationOwners,
-  useApplicationServicePrincipals,
   useApplicationCredentialHealth,
   useApplicationPermissions,
   useApplicationManifest,
@@ -22,7 +21,6 @@ import {
   Info,
   Verified,
   Palette,
-  Webhook,
   ShieldCheck,
   Layers,
   FileCode,
@@ -34,7 +32,6 @@ import {
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
 
 export default function AppRegistrationDetailPage() {
   const params = useParams();
@@ -44,7 +41,6 @@ export default function AppRegistrationDetailPage() {
   // React Query Hooks
   const { data: app, isLoading: isAppLoading, error: appError, refetch: refetchApp } = useApplication(id);
   const { data: owners = [], isLoading: isOwnersLoading } = useApplicationOwners(id);
-  const { data: linkedSps = [], isLoading: isSpsLoading } = useApplicationServicePrincipals(id);
   const { data: credHealth, isLoading: isCredsLoading } = useApplicationCredentialHealth(id);
   const { data: permissions = [], isLoading: isPermsLoading } = useApplicationPermissions(id);
   const { data: manifest, isLoading: isManifestLoading } = useApplicationManifest(id);

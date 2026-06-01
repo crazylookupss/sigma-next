@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useUser } from "@/hooks/use-users";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -19,7 +19,6 @@ import {
   Check,
   Briefcase,
   MapPin,
-  Calendar,
   Layers,
   Award,
   Info,
@@ -35,7 +34,6 @@ import { useState } from "react";
 
 export default function UserDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const { data: user, isLoading, error } = useUser(params.id as string);
   
   // Navigation Tabs state

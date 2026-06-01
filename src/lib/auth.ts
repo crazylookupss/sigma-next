@@ -1,7 +1,12 @@
 import NextAuth from "next-auth";
 import EntraID from "next-auth/providers/microsoft-entra-id";
 
+const apiScope =
+  process.env.AZURE_AD_API_SCOPE ??
+  "api://f0ee212a-b836-4f5c-aafe-bee4b0ebfcfb/access_as_user";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: process.env.AUTH_TRUST_HOST === "true",
   providers: [
     EntraID({
       clientId: process.env.AZURE_AD_CLIENT_ID!,
@@ -9,8 +14,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       issuer: `https://login.microsoftonline.com/${process.env.AZURE_AD_TENANT_ID}/v2.0`,
       authorization: {
         params: {
-          scope: "openid profile email offline_access api://f0ee212a-b836-4f5c-aafe-bee4b0ebfcfb/access_as_user ",
-        }, //api://80fd4919-4d7d-4fae-95a2-3342858a5166/access_as_user // api://f0ee212a-b836-4f5c-aafe-bee4b0ebfcfb/access_as_user
+          scope: `openid profile email offline_access ${apiScope}`,
+        },
       },
     }),
   ],

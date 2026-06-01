@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { OverviewField } from "@/components/shared/overview-field";
-import { formatDate, formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 export default function DashboardPage() {

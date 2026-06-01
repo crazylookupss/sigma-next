@@ -8,7 +8,6 @@ interface MetricCardProps {
   value: string | number | null | undefined;
   icon: React.ReactNode;
   accentColor: string;
-  href?: string;
   onClick?: () => void;
 }
 
@@ -33,7 +32,6 @@ export function MetricCard({
   value,
   icon,
   accentColor,
-  href,
   onClick,
 }: MetricCardProps) {
   const bg = accentBgMap[accentColor] || accentBgMap.blue;

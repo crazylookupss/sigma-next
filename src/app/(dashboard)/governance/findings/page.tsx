@@ -7,12 +7,11 @@ import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { useGovernanceFindings } from "@/hooks/use-governance";
 import { governanceService } from "@/services/governance";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ShieldAlert,
-  Shield,
   BellRing,
   ExternalLink,
   RefreshCw,

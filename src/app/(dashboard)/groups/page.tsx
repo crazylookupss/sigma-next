@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RefreshCw, Search, Group as GroupsIcon } from "lucide-react";
 import type { EntraGroup } from "@/types/group";
-import { formatDate } from "@/lib/utils";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 

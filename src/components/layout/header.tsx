@@ -2,7 +2,7 @@
 
 import { ThemeToggle } from "./theme-toggle";
 import { useSidebarStore } from "@/stores/sidebar";
-import { Menu, LogOut, User } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
 export function Header() {
