@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Copy } from "lucide-react";
 
 interface OverviewFieldProps {
@@ -8,7 +9,7 @@ interface OverviewFieldProps {
   onCopy?: () => void;
 }
 
-export function OverviewField({ label, value, mono, copyable, onCopy }: OverviewFieldProps) {
+export const OverviewField = memo(function OverviewField({ label, value, mono, copyable, onCopy }: OverviewFieldProps) {
   return (
     <div className="flex items-center justify-between py-2.5 border-b border-border/50 last:border-b-0">
       <span className="text-sm text-muted-foreground">{label}</span>
@@ -35,5 +36,5 @@ export function OverviewField({ label, value, mono, copyable, onCopy }: Overview
       </div>
     </div>
   );
-}
+});
 

@@ -15,7 +15,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useState } from "react";
 import type { TabProps } from "./types";
 
 export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, protocolAnalysisLoading, protocolError, refetchProtocol, copyToClipboard, copied }: TabProps & {
@@ -24,7 +24,7 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
   protocolError?: unknown;
   refetchProtocol?: () => void;
 }) {
-  const now = useMemo(() => Date.now(), []);
+  const [now] = useState(() => Date.now());
   return (
     <>
       <Card>

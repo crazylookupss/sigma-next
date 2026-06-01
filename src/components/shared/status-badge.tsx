@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 
 interface StatusBadgeProps {
@@ -14,7 +15,7 @@ const statusConfig = {
   unknown: { dot: "bg-muted-foreground/50", text: "text-muted-foreground", label: "Unknown" },
 };
 
-export function StatusBadge({ status, label }: StatusBadgeProps) {
+export const StatusBadge = memo(function StatusBadge({ status, label }: StatusBadgeProps) {
   const config = statusConfig[status];
   return (
     <div className="flex items-center gap-2">
@@ -24,4 +25,4 @@ export function StatusBadge({ status, label }: StatusBadgeProps) {
       </span>
     </div>
   );
-}
+});

@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +28,7 @@ const accentBorderMap: Record<string, string> = {
   indigo: "border-l-[3px] border-l-indigo-500",
 };
 
-export function MetricCard({
+export const MetricCard = memo(function MetricCard({
   title,
   value,
   icon,
@@ -61,4 +62,4 @@ export function MetricCard({
       </div>
     </motion.div>
   );
-}
+});
