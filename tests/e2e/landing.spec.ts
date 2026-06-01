@@ -11,7 +11,7 @@ test.describe("Landing page", () => {
 
   test("shows feature descriptions", async ({ page }) => {
     await page.goto("/landing");
-    await expect(page.getByText(/entra id/i)).toBeVisible();
+    await expect(page.getByText(/entra id/i).first()).toBeVisible();
   });
 });
 
