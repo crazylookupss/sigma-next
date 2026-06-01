@@ -1,6 +1,6 @@
 import { getSession } from "next-auth/react";
 
-const API_BASE = "/api/v1/entra";
+const DEFAULT_API_BASE = "/api/v1/entra";
 
 export class ApiRequestError extends Error {
   constructor(
@@ -14,16 +14,18 @@ export class ApiRequestError extends Error {
 
 export async function fetchApi<T>(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit & { basePath?: string }
 ): Promise<T> {
-  const url = `${API_BASE}${endpoint}`;
-  
+  const base = options?.basePath ?? DEFAULT_API_BASE;
+  const url = `${base}${endpoint}`;
+  const { basePath: _, ...fetchOptions } = options ?? {};
+
   // Extract active NextAuth session containing the Entra ID access token
   const session = await getSession();
-  
+
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...(options?.headers as Record<string, string> ?? {}),
+    ...(fetchOptions.headers as Record<string, string> ?? {}),
   };
 
   // If user is authenticated, inject their Bearer token to authorize C# Graph requests
@@ -32,7 +34,7 @@ export async function fetchApi<T>(
   }
 
   const res = await fetch(url, {
-    ...options,
+    ...fetchOptions,
     headers,
   });
 

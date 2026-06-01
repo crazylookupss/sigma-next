@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
@@ -8,7 +8,9 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { useUsers } from "@/hooks/use-users";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RefreshCw, Search, Users as UsersIcon } from "lucide-react";
+import { SearchInput } from "@/components/shared/search-input";
+import { ChevronRightIcon } from "@/components/shared/chevron-right";
+import { RefreshCw, Users as UsersIcon } from "lucide-react";
 import type { SigmaUserDto } from "@/types/user";
 import type { PagedResponse } from "@/types/common";
 import { getInitials } from "@/lib/utils";
@@ -32,11 +34,19 @@ export default function UsersPage() {
   const router = useRouter();
   const { data, isLoading, error, refetch, isFetching } = useUsers();
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+
+  const handleRowClicked = useCallback(
+    (params: { data?: SigmaUserDto }) => {
+      if (params.data) router.push(`/users/${params.data.id}`);
+    },
+    [router]
+  );
 
   const filteredUsers = useMemo(() => {
     const list = extractUsers(data);
-    if (!search.trim()) return list;
-    const q = search.toLowerCase();
+    if (!deferredSearch.trim()) return list;
+    const q = deferredSearch.toLowerCase();
     return list.filter(
       (u) =>
         u.displayName?.toLowerCase().includes(q) ||
@@ -45,7 +55,7 @@ export default function UsersPage() {
         u.jobTitle?.toLowerCase().includes(q) ||
         u.userType?.toLowerCase().includes(q)
     );
-  }, [data, search]);
+  }, [data, deferredSearch]);
 
   const colDefs: ColDef<SigmaUserDto>[] = useMemo(
     () => [
@@ -165,14 +175,11 @@ export default function UsersPage() {
 
       {/* Search */}
       <div className="glass-card p-4 mb-4">
-        <div className="relative max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search users..."
+        <div className="max-w-xs">
+          <SearchInput
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-accent border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+            onChange={setSearch}
+            placeholder="Search users..."
           />
         </div>
       </div>
@@ -210,7 +217,7 @@ export default function UsersPage() {
               columnDefs={colDefs}
               pagination={true}
               paginationPageSize={50}
-              onRowClicked={(e) => { if (e.data) router.push(`/users/${e.data.id}`); }}
+              onRowClicked={handleRowClicked}
               defaultColDef={{
                 resizable: true,
                 cellStyle: { display: "flex", alignItems: "center" },
@@ -227,10 +234,4 @@ export default function UsersPage() {
   );
 }
 
-function ChevronRightIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-    </svg>
-  );
-}
+

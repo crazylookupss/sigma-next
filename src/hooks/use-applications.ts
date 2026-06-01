@@ -37,6 +37,7 @@ export function useServicePrincipal(id: string) {
     queryFn: ({ signal }) => applicationService.getServicePrincipalById(id, signal),
     staleTime: 30 * 1000,
     refetchInterval: 60 * 1000,
+    refetchIntervalInBackground: false,
     enabled: !!id,
     retry: 1,
   });
@@ -146,7 +147,8 @@ export function useServicePrincipalSsoConfig(id: string) {
     queryKey: ["service-principals", id, "sso-config"],
     queryFn: ({ signal }) => applicationService.getServicePrincipalSsoConfig(id, signal),
     staleTime: 30 * 1000,
-    refetchInterval: 30 * 1000,
+    refetchInterval: 120 * 1000,
+    refetchIntervalInBackground: false,
     enabled: !!id,
     retry: 1,
   });

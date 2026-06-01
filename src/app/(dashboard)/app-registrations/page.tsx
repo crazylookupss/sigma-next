@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
@@ -8,7 +8,9 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { useApplications } from "@/hooks/use-applications";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RefreshCw, Search, Code2 } from "lucide-react";
+import { SearchInput } from "@/components/shared/search-input";
+import { ChevronRightIcon } from "@/components/shared/chevron-right";
+import { RefreshCw, Code2 } from "lucide-react";
 import type { EntraApplication } from "@/types/application";
 import type { PagedResponse } from "@/types/common";
 import { formatDate } from "@/lib/utils";
@@ -32,18 +34,26 @@ export default function AppRegistrationsPage() {
   const router = useRouter();
   const { data, isLoading, error, refetch, isFetching } = useApplications();
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+
+  const handleRowClicked = useCallback(
+    (params: { data?: EntraApplication }) => {
+      if (params.data?.id) router.push(`/app-registrations/${params.data.id}`);
+    },
+    [router]
+  );
 
   const filtered = useMemo(() => {
     const list = extractApplications(data);
-    if (!search.trim()) return list;
-    const q = search.toLowerCase();
+    if (!deferredSearch.trim()) return list;
+    const q = deferredSearch.toLowerCase();
     return list.filter(
       (a) =>
         a.displayName?.toLowerCase().includes(q) ||
         a.appId?.toLowerCase().includes(q) ||
         a.publisherDomain?.toLowerCase().includes(q)
     );
-  }, [data, search]);
+  }, [data, deferredSearch]);
 
   const colDefs: ColDef<EntraApplication>[] = useMemo(
     () => [
@@ -133,14 +143,11 @@ export default function AppRegistrationsPage() {
       </div>
 
       <div className="glass-card p-4 mb-4">
-        <div className="relative max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search app registrations..."
+        <div className="max-w-xs">
+          <SearchInput
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-accent border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+            onChange={setSearch}
+            placeholder="Search app registrations..."
           />
         </div>
       </div>
@@ -185,9 +192,7 @@ export default function AppRegistrationsPage() {
               headerHeight={44}
               suppressCellFocus={true}
               animateRows={true}
-              onRowClicked={(e) => {
-                if (e.data?.id) router.push(`/app-registrations/${e.data.id}`);
-              }}
+              onRowClicked={handleRowClicked}
               rowStyle={{ cursor: "pointer" }}
             />
           </div>
@@ -197,10 +202,4 @@ export default function AppRegistrationsPage() {
   );
 }
 
-function ChevronRightIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-    </svg>
-  );
-}
+

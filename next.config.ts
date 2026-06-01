@@ -6,6 +6,22 @@ const nextConfig: NextConfig = {
   // Remove the X-Powered-By header for security
   poweredByHeader: false,
 
+  reactStrictMode: true,
+
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "@tanstack/react-query",
+      "recharts",
+      "framer-motion",
+      "class-variance-authority",
+    ],
+  },
+
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
+
   async headers() {
     return [
       {

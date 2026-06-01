@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
@@ -10,9 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MetricCard } from "@/components/shared/metric-card";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { SearchInput } from "@/components/shared/search-input";
+import { ChevronRightIcon } from "@/components/shared/chevron-right";
 import {
   RefreshCw,
-  Search,
   AppWindow,
   CheckCircle2,
   AlertTriangle,
@@ -41,18 +42,26 @@ export default function ApplicationsPage() {
   const { data: spData, isLoading, error, refetch, isFetching } = useServicePrincipals();
   const { data: dashboard } = useAppDashboard();
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+
+  const handleRowClicked = useCallback(
+    (params: { data?: EntraServicePrincipal }) => {
+      if (params.data) router.push(`/applications/${params.data.id}`);
+    },
+    [router]
+  );
 
   const filtered = useMemo(() => {
     const list = extractServicePrincipals(spData);
-    if (!search.trim()) return list;
-    const q = search.toLowerCase();
+    if (!deferredSearch.trim()) return list;
+    const q = deferredSearch.toLowerCase();
     return list.filter(
       (s) =>
         s.displayName?.toLowerCase().includes(q) ||
         s.appDisplayName?.toLowerCase().includes(q) ||
         s.id?.toLowerCase().includes(q)
     );
-  }, [spData, search]);
+  }, [spData, deferredSearch]);
 
   const colDefs: ColDef<EntraServicePrincipal>[] = useMemo(
     () => [
@@ -168,14 +177,11 @@ export default function ApplicationsPage() {
 
       {/* Search */}
       <div className="glass-card p-4 mb-4">
-        <div className="relative max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search applications..."
+        <div className="max-w-xs">
+          <SearchInput
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-accent border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+            onChange={setSearch}
+            placeholder="Search applications..."
           />
         </div>
       </div>
@@ -213,7 +219,7 @@ export default function ApplicationsPage() {
               columnDefs={colDefs}
               pagination={true}
               paginationPageSize={50}
-              onRowClicked={(e) => { if (e.data) router.push(`/applications/${e.data.id}`); }}
+              onRowClicked={handleRowClicked}
               defaultColDef={{
                 resizable: true,
                 cellStyle: { display: "flex", alignItems: "center" },
@@ -230,10 +236,4 @@ export default function ApplicationsPage() {
   );
 }
 
-function ChevronRightIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-    </svg>
-  );
-}
+
