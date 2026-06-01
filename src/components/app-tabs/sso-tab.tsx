@@ -104,7 +104,7 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
                             </thead>
                             <tbody className="divide-y divide-border/60 font-medium">
                               {ssoConfig?.samlClaims && ssoConfig.samlClaims.length > 0 ? (
-                                ssoConfig.samlClaims.map((claim, idx) => (
+                                ssoConfig.samlClaims.map((claim: { namespace: string; name: string; value: string }, idx: number) => (
                                   <tr key={idx} className="hover:bg-accent/10">
                                     <td className="py-2.5 px-3 text-foreground font-mono">{claim.namespace || claim.name.split('/').pop()}</td>
                                     <td className="py-2.5 px-3 text-muted-foreground font-mono">{claim.value}</td>
@@ -161,7 +161,7 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
                         </div>
                         <div className="space-y-3">
                           {ssoConfig?.certificates && ssoConfig.certificates.length > 0 ? (
-                            ssoConfig.certificates.map((cert) => {
+                            ssoConfig.certificates.map((cert: { keyId: string | null; displayName: string | null; thumbprint: string | null; endDateTime: string | null; startDateTime: string | null }) => {
                               const isExpired = cert.endDateTime ? new Date(cert.endDateTime).getTime() < Date.now() : false;
                               return (
                                 <div key={cert.keyId || cert.thumbprint} className="p-3 rounded-lg border border-border/70 bg-card space-y-2">
@@ -174,7 +174,7 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
                                       <p className="text-muted-foreground font-semibold">Thumbprint:</p>
                                       <div className="flex items-center gap-1">
                                         <span className="font-mono text-foreground break-all select-all">{cert.thumbprint.toUpperCase()}</span>
-                                        <button onClick={() => copyToClipboard(cert.thumbprint!.toUpperCase())} className="text-muted-foreground hover:text-foreground">
+                                        <button onClick={() => copyToClipboard(cert.thumbprint!.toUpperCase(), "Thumbprint")} className="text-muted-foreground hover:text-foreground">
                                           {copied === "Thumbprint" ? <span className="w-3 h-3 text-success">✓</span> : <span className="w-3 h-3">📋</span>}
                                         </button>
                                       </div>
@@ -222,11 +222,11 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
                             <div className="flex justify-between"><span className="text-muted-foreground">Required</span><span className="font-semibold text-foreground">No</span></div>
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Active Certificates</span>
-                              <Badge variant="secondary" className="text-[9px] py-0 px-1.5 font-bold">{ssoConfig?.certificates?.filter(c => c.endDateTime ? new Date(c.endDateTime).getTime() > Date.now() : true).length ?? 0}</Badge>
+                              <Badge variant="secondary" className="text-[9px] py-0 px-1.5 font-bold">{ssoConfig?.certificates?.filter((c: { endDateTime: string | null }) => c.endDateTime ? new Date(c.endDateTime).getTime() > Date.now() : true).length ?? 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Expired Certificates</span>
-                              <Badge variant="secondary" className="text-[9px] py-0 px-1.5 font-bold">{ssoConfig?.certificates?.filter(c => c.endDateTime ? new Date(c.endDateTime).getTime() <= Date.now() : false).length ?? 0}</Badge>
+                              <Badge variant="secondary" className="text-[9px] py-0 px-1.5 font-bold">{ssoConfig?.certificates?.filter((c: { endDateTime: string | null }) => c.endDateTime ? new Date(c.endDateTime).getTime() <= Date.now() : false).length ?? 0}</Badge>
                             </div>
                           </div>
                         </div>

@@ -8,7 +8,6 @@ import {
   Settings,
   Key,
   UserCheck,
-  Users,
   Network,
   Layers,
 } from "lucide-react";

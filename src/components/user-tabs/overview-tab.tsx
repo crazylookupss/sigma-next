@@ -5,12 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { FieldItem } from "./field-item";
 import { getInitials, formatDate } from "@/lib/utils";
 import {
-  Activity,
   Info,
-  UserCheck,
   Building2,
   ChevronRight,
-  Layers,
 } from "lucide-react";
 import Link from "next/link";
 import type { UserTabProps } from "./types";

@@ -225,7 +225,7 @@ export default function UserDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {activeTab === "overview" && <OverviewTab {...tabProps} setActiveTab={setActiveTab} />}
+        {activeTab === "overview" && <OverviewTab {...tabProps} setActiveTab={(tab: string) => setActiveTab(tab as TabId)} />}
         {activeTab === "identity" && <IdentityTab {...tabProps} />}
         {activeTab === "contact" && <ContactTab {...tabProps} />}
         {activeTab === "security" && <SecurityTab {...tabProps} />}
