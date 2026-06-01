@@ -18,6 +18,7 @@ export async function fetchApi<T>(
 ): Promise<T> {
   const base = options?.basePath ?? DEFAULT_API_BASE;
   const url = `${base}${endpoint}`;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { basePath: _, ...fetchOptions } = options ?? {};
 
   // Extract active NextAuth session containing the Entra ID access token

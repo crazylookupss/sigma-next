@@ -15,6 +15,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 import type { TabProps } from "./types";
 
 export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, protocolAnalysisLoading, protocolError, refetchProtocol, copyToClipboard, copied }: TabProps & {
@@ -23,6 +24,7 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
   protocolError?: unknown;
   refetchProtocol?: () => void;
 }) {
+  const now = useMemo(() => Date.now(), []);
   return (
     <>
       <Card>
@@ -162,7 +164,7 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
                         <div className="space-y-3">
                           {ssoConfig?.certificates && ssoConfig.certificates.length > 0 ? (
                             ssoConfig.certificates.map((cert: { keyId: string | null; displayName: string | null; thumbprint: string | null; endDateTime: string | null; startDateTime: string | null }) => {
-                              const isExpired = cert.endDateTime ? new Date(cert.endDateTime).getTime() < Date.now() : false;
+                              const isExpired = cert.endDateTime ? new Date(cert.endDateTime).getTime() < now : false;
                               return (
                                 <div key={cert.keyId || cert.thumbprint} className="p-3 rounded-lg border border-border/70 bg-card space-y-2">
                                   <div className="flex items-center justify-between">
@@ -222,11 +224,11 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
                             <div className="flex justify-between"><span className="text-muted-foreground">Required</span><span className="font-semibold text-foreground">No</span></div>
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Active Certificates</span>
-                              <Badge variant="secondary" className="text-[9px] py-0 px-1.5 font-bold">{ssoConfig?.certificates?.filter((c: { endDateTime: string | null }) => c.endDateTime ? new Date(c.endDateTime).getTime() > Date.now() : true).length ?? 0}</Badge>
+                              <Badge variant="secondary" className="text-[9px] py-0 px-1.5 font-bold">{ssoConfig?.certificates?.filter((c: { endDateTime: string | null }) => c.endDateTime ? new Date(c.endDateTime).getTime() > now : true).length ?? 0}</Badge>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Expired Certificates</span>
-                              <Badge variant="secondary" className="text-[9px] py-0 px-1.5 font-bold">{ssoConfig?.certificates?.filter((c: { endDateTime: string | null }) => c.endDateTime ? new Date(c.endDateTime).getTime() <= Date.now() : false).length ?? 0}</Badge>
+                              <Badge variant="secondary" className="text-[9px] py-0 px-1.5 font-bold">{ssoConfig?.certificates?.filter((c: { endDateTime: string | null }) => c.endDateTime ? new Date(c.endDateTime).getTime() <= now : false).length ?? 0}</Badge>
                             </div>
                           </div>
                         </div>
@@ -279,7 +281,7 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
                         {sp.passwordCredentials && sp.passwordCredentials.length > 0 ? (
                           <div className="space-y-3">
                             {sp.passwordCredentials.map((pw) => {
-                              const daysLeft = pw.endDateTime ? Math.round((new Date(pw.endDateTime).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
+                              const daysLeft = pw.endDateTime ? Math.round((new Date(pw.endDateTime).getTime() - now) / (1000 * 60 * 60 * 24)) : null;
                               const isExpired = daysLeft !== null && daysLeft <= 0;
                               const isWarning = daysLeft !== null && daysLeft > 0 && daysLeft <= 30;
                               return (
