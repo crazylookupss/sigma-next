@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -5,7 +6,7 @@ import { getInitials, getAvatarColor, formatDate } from "@/lib/utils";
 import { Users } from "lucide-react";
 import type { TabProps } from "./types";
 
-export function AssignmentsTab({ assignments, assignmentsLoading, sp }: TabProps & { assignmentsLoading?: boolean }) {
+export const AssignmentsTab = memo(function AssignmentsTab({ assignments, assignmentsLoading, sp }: TabProps & { assignmentsLoading?: boolean }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between py-3 border-b border-border/20">
@@ -81,4 +82,4 @@ export function AssignmentsTab({ assignments, assignmentsLoading, sp }: TabProps
       </CardContent>
     </Card>
   );
-}
+});

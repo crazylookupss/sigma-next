@@ -1,12 +1,13 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Monitor } from "lucide-react";
 import type { GroupTabProps } from "./types";
 
-export function DevicesTab({ devices, isDevicesLoading }: GroupTabProps) {
+export const DevicesTab = memo(function DevicesTab({ devices, isDevicesLoading }: GroupTabProps) {
   return (
     <Card>
       <CardHeader><h3 className="text-sm font-semibold text-foreground">Associated Hardware Devices</h3></CardHeader>
@@ -55,4 +56,4 @@ export function DevicesTab({ devices, isDevicesLoading }: GroupTabProps) {
       </CardContent>
     </Card>
   );
-}
+});

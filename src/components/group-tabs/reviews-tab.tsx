@@ -1,12 +1,13 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";
 import type { GroupTabProps } from "./types";
 
-export function ReviewsTab({ accessReviews, isReviewsLoading }: GroupTabProps) {
+export const ReviewsTab = memo(function ReviewsTab({ accessReviews, isReviewsLoading }: GroupTabProps) {
   return (
     <Card>
       <CardHeader><h3 className="text-sm font-semibold text-foreground">Identity Access Reviews</h3></CardHeader>
@@ -48,4 +49,4 @@ export function ReviewsTab({ accessReviews, isReviewsLoading }: GroupTabProps) {
       </CardContent>
     </Card>
   );
-}
+});

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Award, Layers, FileSpreadsheet, PlusCircle } from "lucide-react";
 import { ExtensionAttributeWidget } from "./extension-attribute-widget";
 import type { UserTabProps } from "./types";
 
-export function LicensesTab({ user, copyToClipboard }: UserTabProps) {
+export const LicensesTab = memo(function LicensesTab({ user, copyToClipboard }: UserTabProps) {
   const [showConfiguredOnly, setShowConfiguredOnly] = useState(true);
 
   const extAttrs = user.onPremisesExtensionAttributes;
@@ -123,4 +123,4 @@ export function LicensesTab({ user, copyToClipboard }: UserTabProps) {
       </div>
     </>
   );
-}
+});

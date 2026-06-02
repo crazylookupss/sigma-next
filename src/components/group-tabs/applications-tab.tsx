@@ -1,11 +1,12 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";
 import type { GroupTabProps } from "./types";
 
-export function ApplicationsTab({ apps, isAppsLoading }: GroupTabProps) {
+export const ApplicationsTab = memo(function ApplicationsTab({ apps, isAppsLoading }: GroupTabProps) {
   return (
     <Card>
       <CardHeader><h3 className="text-sm font-semibold text-foreground">Assigned Enterprise Application Roles</h3></CardHeader>
@@ -42,4 +43,4 @@ export function ApplicationsTab({ apps, isAppsLoading }: GroupTabProps) {
       </CardContent>
     </Card>
   );
-}
+});

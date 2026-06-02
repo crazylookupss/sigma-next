@@ -1,10 +1,11 @@
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OverviewField } from "@/components/shared/overview-field";
 import { formatDate } from "@/lib/utils";
 import type { TabProps } from "./types";
 
-export function PropertiesTab({ sp, ssoConfig, copyToClipboard }: TabProps) {
+export const PropertiesTab = memo(function PropertiesTab({ sp, ssoConfig, copyToClipboard }: TabProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <Card>
@@ -62,4 +63,4 @@ export function PropertiesTab({ sp, ssoConfig, copyToClipboard }: TabProps) {
       </div>
     </div>
   );
-}
+});

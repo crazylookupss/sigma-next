@@ -1,12 +1,13 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";
 import type { GroupTabProps } from "./types";
 
-export function AuditTab({ auditLogs, isLogsLoading }: GroupTabProps) {
+export const AuditTab = memo(function AuditTab({ auditLogs, isLogsLoading }: GroupTabProps) {
   return (
     <Card>
       <CardHeader><h3 className="text-sm font-semibold text-foreground">Directory Audit Log History</h3></CardHeader>
@@ -50,4 +51,4 @@ export function AuditTab({ auditLogs, isLogsLoading }: GroupTabProps) {
       </CardContent>
     </Card>
   );
-}
+});

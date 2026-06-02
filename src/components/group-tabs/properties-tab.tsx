@@ -1,12 +1,13 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Field } from "./field";
 import { formatDate } from "@/lib/utils";
 import type { GroupTabProps } from "./types";
 
-export function PropertiesTab({ group }: GroupTabProps) {
+export const PropertiesTab = memo(function PropertiesTab({ group }: GroupTabProps) {
   return (
     <Card>
       <CardHeader><h3 className="text-sm font-semibold text-foreground">Full Directory Schema Properties</h3></CardHeader>
@@ -37,4 +38,4 @@ export function PropertiesTab({ group }: GroupTabProps) {
       </CardContent>
     </Card>
   );
-}
+});

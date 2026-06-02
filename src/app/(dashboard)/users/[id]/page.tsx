@@ -20,6 +20,7 @@ import {
 import Link from "next/link";
 import { getInitials } from "@/lib/utils";
 import { useState, useCallback } from "react";
+import { TabErrorBoundary } from "@/components/shared/error-boundary";
 
 type TabId = "overview" | "identity" | "contact" | "security" | "licenses";
 
@@ -225,11 +226,13 @@ export default function UserDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {activeTab === "overview" && <OverviewTab {...tabProps} setActiveTab={(tab: string) => setActiveTab(tab as TabId)} />}
-        {activeTab === "identity" && <IdentityTab {...tabProps} />}
-        {activeTab === "contact" && <ContactTab {...tabProps} />}
-        {activeTab === "security" && <SecurityTab {...tabProps} />}
-        {activeTab === "licenses" && <LicensesTab {...tabProps} />}
+        <TabErrorBoundary>
+          {activeTab === "overview" && <OverviewTab {...tabProps} setActiveTab={(tab: string) => setActiveTab(tab as TabId)} />}
+          {activeTab === "identity" && <IdentityTab {...tabProps} />}
+          {activeTab === "contact" && <ContactTab {...tabProps} />}
+          {activeTab === "security" && <SecurityTab {...tabProps} />}
+          {activeTab === "licenses" && <LicensesTab {...tabProps} />}
+        </TabErrorBoundary>
       </div>
     </div>
   );

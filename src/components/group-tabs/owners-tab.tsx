@@ -1,10 +1,11 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { GroupTabProps } from "./types";
 
-export function OwnersTab({ owners, isOwnersLoading }: GroupTabProps) {
+export const OwnersTab = memo(function OwnersTab({ owners, isOwnersLoading }: GroupTabProps) {
   return (
     <Card>
       <CardHeader><h3 className="text-sm font-semibold text-foreground">Group Owners</h3></CardHeader>
@@ -41,4 +42,4 @@ export function OwnersTab({ owners, isOwnersLoading }: GroupTabProps) {
       </CardContent>
     </Card>
   );
-}
+});

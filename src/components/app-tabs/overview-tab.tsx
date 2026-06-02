@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,7 +14,7 @@ import {
 } from "lucide-react";
 import type { TabProps } from "./types";
 
-export function OverviewTab({ sp, ssoConfig, owners, ownersLoading, assignments, proxyConfig, proxyConfigLoading }: TabProps & { ownersLoading?: boolean; proxyConfigLoading?: boolean }) {
+export const OverviewTab = memo(function OverviewTab({ sp, ssoConfig, owners, ownersLoading, assignments, proxyConfig, proxyConfigLoading }: TabProps & { ownersLoading?: boolean; proxyConfigLoading?: boolean }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div className="space-y-6">
@@ -162,4 +163,4 @@ export function OverviewTab({ sp, ssoConfig, owners, ownersLoading, assignments,
       </div>
     </div>
   );
-}
+});

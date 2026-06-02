@@ -15,10 +15,10 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, memo } from "react";
 import type { TabProps } from "./types";
 
-export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, protocolAnalysisLoading, protocolError, refetchProtocol, copyToClipboard, copied }: TabProps & {
+export const SsoTab = memo(function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, protocolAnalysisLoading, protocolError, refetchProtocol, copyToClipboard, copied }: TabProps & {
   ssoConfigLoading?: boolean;
   protocolAnalysisLoading?: boolean;
   protocolError?: unknown;
@@ -537,4 +537,4 @@ export function SsoTab({ sp, ssoConfig, ssoConfigLoading, protocolAnalysis, prot
       </Card>
     </>
   );
-}
+});

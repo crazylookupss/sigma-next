@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,7 +9,7 @@ import { formatDate } from "@/lib/utils";
 import { Monitor } from "lucide-react";
 import type { GroupTabProps } from "./types";
 
-export function OverviewTab({ group, members, owners, apps, devices, auditLogs, directUsers, directGroups, directDevices, directOthers, isOwnersLoading, isAppsLoading, isDevicesLoading, isLogsLoading, setActiveTab }: GroupTabProps & {
+export const OverviewTab = memo(function OverviewTab({ group, members, owners, apps, devices, auditLogs, directUsers, directGroups, directDevices, directOthers, isOwnersLoading, isAppsLoading, isDevicesLoading, isLogsLoading, setActiveTab }: GroupTabProps & {
   directUsers: number;
   directGroups: number;
   directDevices: number;
@@ -173,4 +174,4 @@ export function OverviewTab({ group, members, owners, apps, devices, auditLogs, 
       </Card>
     </div>
   );
-}
+});

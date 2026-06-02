@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FieldItem } from "./field-item";
@@ -12,7 +13,7 @@ import {
 import Link from "next/link";
 import type { UserTabProps } from "./types";
 
-export function OverviewTab({ user, setActiveTab }: UserTabProps & { setActiveTab?: (tab: string) => void }) {
+export const OverviewTab = memo(function OverviewTab({ user, setActiveTab }: UserTabProps & { setActiveTab?: (tab: string) => void }) {
   return (
     <>
       <div className="lg:col-span-2 space-y-6">
@@ -134,4 +135,4 @@ export function OverviewTab({ user, setActiveTab }: UserTabProps & { setActiveTa
       </div>
     </>
   );
-}
+});

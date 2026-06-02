@@ -1,9 +1,10 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { FolderOpen } from "lucide-react";
 
-export function MembershipsTab() {
+export const MembershipsTab = memo(function MembershipsTab() {
   return (
     <Card>
       <CardHeader><h3 className="text-sm font-semibold text-foreground">Parent Group Memberships</h3></CardHeader>
@@ -18,4 +19,4 @@ export function MembershipsTab() {
       </CardContent>
     </Card>
   );
-}
+});

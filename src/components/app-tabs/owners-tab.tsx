@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -5,7 +6,7 @@ import { getInitials, getAvatarColor } from "@/lib/utils";
 import { UserCheck, Mail } from "lucide-react";
 import type { TabProps } from "./types";
 
-export function OwnersTab({ owners, ownersLoading }: TabProps & { ownersLoading?: boolean }) {
+export const OwnersTab = memo(function OwnersTab({ owners, ownersLoading }: TabProps & { ownersLoading?: boolean }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between py-3 border-b border-border/20">
@@ -63,4 +64,4 @@ export function OwnersTab({ owners, ownersLoading }: TabProps & { ownersLoading?
       </CardContent>
     </Card>
   );
-}
+});

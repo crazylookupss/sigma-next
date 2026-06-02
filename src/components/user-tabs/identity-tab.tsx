@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FieldItem } from "./field-item";
@@ -7,7 +8,7 @@ import { formatDate } from "@/lib/utils";
 import { Fingerprint, UserCheck, Building2 } from "lucide-react";
 import type { UserTabProps } from "./types";
 
-export function IdentityTab({ user }: UserTabProps) {
+export const IdentityTab = memo(function IdentityTab({ user }: UserTabProps) {
   return (
     <>
       <div className="lg:col-span-2 space-y-6">
@@ -83,4 +84,4 @@ export function IdentityTab({ user }: UserTabProps) {
       </div>
     </>
   );
-}
+});

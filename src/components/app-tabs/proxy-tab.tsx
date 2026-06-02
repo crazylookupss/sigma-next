@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -5,7 +6,7 @@ import { OverviewField } from "@/components/shared/overview-field";
 import { Globe, Settings, Network } from "lucide-react";
 import type { TabProps } from "./types";
 
-export function ProxyTab({ proxyConfig, proxyConfigLoading, copyToClipboard }: TabProps & { proxyConfigLoading?: boolean }) {
+export const ProxyTab = memo(function ProxyTab({ proxyConfig, proxyConfigLoading, copyToClipboard }: TabProps & { proxyConfigLoading?: boolean }) {
   return (
     <Card>
       <CardHeader className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 py-3 border-b border-border/20">
@@ -84,4 +85,4 @@ export function ProxyTab({ proxyConfig, proxyConfigLoading, copyToClipboard }: T
       </CardContent>
     </Card>
   );
-}
+});

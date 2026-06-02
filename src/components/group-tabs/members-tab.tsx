@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { GroupTabProps } from "./types";
 
-export function MembersTab({ members, isMembersLoading }: GroupTabProps) {
+export const MembersTab = memo(function MembersTab({ members, isMembersLoading }: GroupTabProps) {
   const [membersSearch, setMembersSearch] = useState("");
   const [membersTypeFilter, setMembersTypeFilter] = useState("All");
 
@@ -90,4 +90,4 @@ export function MembersTab({ members, isMembersLoading }: GroupTabProps) {
       </CardContent>
     </Card>
   );
-}
+});

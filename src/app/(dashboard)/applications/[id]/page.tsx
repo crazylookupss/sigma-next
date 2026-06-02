@@ -30,6 +30,7 @@ import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { TabErrorBoundary } from "@/components/shared/error-boundary";
 
 type TabId = "overview" | "properties" | "owners" | "assignments" | "sso" | "proxy";
 
@@ -38,15 +39,15 @@ export default function ApplicationDetailPage() {
   const router = useRouter();
   const appIdOrId = params.id as string;
 
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [copied, setCopied] = useState<string | null>(null);
+
   const { data: sp, isLoading: spLoading, error: spError, refetch: refetchSp } = useServicePrincipal(appIdOrId);
   const { data: owners = [], isLoading: ownersLoading } = useServicePrincipalOwners(appIdOrId, activeTab === "owners" || activeTab === "overview");
   const { data: assignments = [], isLoading: assignmentsLoading } = useServicePrincipalAssignments(appIdOrId, activeTab === "assignments");
   const { data: ssoConfig, isLoading: ssoConfigLoading } = useServicePrincipalSsoConfig(appIdOrId, activeTab === "sso");
   const { data: protocolAnalysis, isLoading: protocolAnalysisLoading, error: protocolError, refetch: refetchProtocol } = useProtocolAnalysis(appIdOrId, activeTab === "sso");
   const { data: proxyConfig, isLoading: proxyConfigLoading } = useProxyConfiguration(appIdOrId, activeTab === "proxy");
-
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
-  const [copied, setCopied] = useState<string | null>(null);
 
   const copyToClipboard = useCallback(async (text: string, label: string) => {
     try {
@@ -243,12 +244,14 @@ export default function ApplicationDetailPage() {
           transition={{ duration: 0.2 }}
           className="space-y-6"
         >
-          {activeTab === "overview" && <OverviewTab {...tabProps} ownersLoading={ownersLoading} proxyConfigLoading={proxyConfigLoading} />}
-          {activeTab === "properties" && <PropertiesTab {...tabProps} />}
-          {activeTab === "owners" && <OwnersTab {...tabProps} ownersLoading={ownersLoading} />}
-          {activeTab === "assignments" && <AssignmentsTab {...tabProps} assignmentsLoading={assignmentsLoading} />}
-          {activeTab === "sso" && <SsoTab {...tabProps} ssoConfigLoading={ssoConfigLoading} protocolAnalysisLoading={protocolAnalysisLoading} protocolError={protocolError} refetchProtocol={refetchProtocol} />}
-          {activeTab === "proxy" && <ProxyTab {...tabProps} proxyConfigLoading={proxyConfigLoading} />}
+          <TabErrorBoundary>
+            {activeTab === "overview" && <OverviewTab {...tabProps} ownersLoading={ownersLoading} proxyConfigLoading={proxyConfigLoading} />}
+            {activeTab === "properties" && <PropertiesTab {...tabProps} />}
+            {activeTab === "owners" && <OwnersTab {...tabProps} ownersLoading={ownersLoading} />}
+            {activeTab === "assignments" && <AssignmentsTab {...tabProps} assignmentsLoading={assignmentsLoading} />}
+            {activeTab === "sso" && <SsoTab {...tabProps} ssoConfigLoading={ssoConfigLoading} protocolAnalysisLoading={protocolAnalysisLoading} protocolError={protocolError} refetchProtocol={refetchProtocol} />}
+            {activeTab === "proxy" && <ProxyTab {...tabProps} proxyConfigLoading={proxyConfigLoading} />}
+          </TabErrorBoundary>
         </motion.div>
       </AnimatePresence>
 

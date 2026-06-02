@@ -28,6 +28,7 @@ import { ArrowLeft, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 import { useState, useMemo } from "react";
+import { TabErrorBoundary } from "@/components/shared/error-boundary";
 
 export default function GroupDetailPage() {
   const params = useParams();
@@ -178,16 +179,18 @@ export default function GroupDetailPage() {
       </div>
 
       <div className="space-y-6">
-        {activeTab === "overview" && <OverviewTab {...tabProps} directUsers={directUsers} directGroups={directGroups} directDevices={directDevices} directOthers={directOthers} setActiveTab={setActiveTab} />}
-        {activeTab === "members" && <MembersTab {...tabProps} />}
-        {activeTab === "owners" && <OwnersTab {...tabProps} />}
-        {activeTab === "memberships" && <MembershipsTab />}
-        {activeTab === "applications" && <ApplicationsTab {...tabProps} />}
-        {activeTab === "devices" && <DevicesTab {...tabProps} />}
-        {activeTab === "entitlements" && <EntitlementsTab />}
-        {activeTab === "reviews" && <ReviewsTab {...tabProps} />}
-        {activeTab === "audit" && <AuditTab {...tabProps} />}
-        {activeTab === "properties" && <PropertiesTab {...tabProps} />}
+        <TabErrorBoundary>
+          {activeTab === "overview" && <OverviewTab {...tabProps} directUsers={directUsers} directGroups={directGroups} directDevices={directDevices} directOthers={directOthers} setActiveTab={setActiveTab} />}
+          {activeTab === "members" && <MembersTab {...tabProps} />}
+          {activeTab === "owners" && <OwnersTab {...tabProps} />}
+          {activeTab === "memberships" && <MembershipsTab />}
+          {activeTab === "applications" && <ApplicationsTab {...tabProps} />}
+          {activeTab === "devices" && <DevicesTab {...tabProps} />}
+          {activeTab === "entitlements" && <EntitlementsTab />}
+          {activeTab === "reviews" && <ReviewsTab {...tabProps} />}
+          {activeTab === "audit" && <AuditTab {...tabProps} />}
+          {activeTab === "properties" && <PropertiesTab {...tabProps} />}
+        </TabErrorBoundary>
       </div>
     </div>
   );

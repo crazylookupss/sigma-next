@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FieldItem } from "./field-item";
@@ -7,7 +8,7 @@ import { formatDate } from "@/lib/utils";
 import { Shield, RefreshCw } from "lucide-react";
 import type { UserTabProps } from "./types";
 
-export function SecurityTab({ user }: UserTabProps) {
+export const SecurityTab = memo(function SecurityTab({ user }: UserTabProps) {
   return (
     <>
       <div className="lg:col-span-2 space-y-6">
@@ -65,4 +66,4 @@ export function SecurityTab({ user }: UserTabProps) {
       </div>
     </>
   );
-}
+});

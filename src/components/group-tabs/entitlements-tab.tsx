@@ -1,9 +1,10 @@
 "use client";
 
+import { memo } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Award } from "lucide-react";
 
-export function EntitlementsTab() {
+export const EntitlementsTab = memo(function EntitlementsTab() {
   return (
     <Card>
       <CardHeader><h3 className="text-sm font-semibold text-foreground">Entitlement Governance</h3></CardHeader>
@@ -18,4 +19,4 @@ export function EntitlementsTab() {
       </CardContent>
     </Card>
   );
-}
+});
