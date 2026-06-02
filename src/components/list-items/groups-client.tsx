@@ -4,15 +4,13 @@ import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import "@/lib/ag-grid-modules";
 import { useGroups } from "@/hooks/use-groups";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchInput } from "@/components/shared/search-input";
 import { RefreshCw, Group as GroupsIcon } from "lucide-react";
 import type { EntraGroup } from "@/types/group";
-
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 export function GroupsClient() {
   const router = useRouter();

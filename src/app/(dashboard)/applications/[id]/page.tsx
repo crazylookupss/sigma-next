@@ -120,6 +120,8 @@ export default function ApplicationDetailPage() {
     );
   }
 
+  const tabProps = { sp, ssoConfig, owners, assignments, protocolAnalysis, proxyConfig, copyToClipboard, copied };
+
   const tabs = [
     { id: "overview" as TabId, label: "Overview", icon: Info },
     { id: "properties" as TabId, label: "Branding & Properties", icon: Settings },
@@ -128,8 +130,6 @@ export default function ApplicationDetailPage() {
     { id: "sso" as TabId, label: "Single Sign-On", icon: Key },
     { id: "proxy" as TabId, label: "Application Proxy", icon: Network },
   ];
-
-  const tabProps = useMemo(() => ({ sp, ssoConfig, owners, assignments, protocolAnalysis, proxyConfig, copyToClipboard, copied }), [sp, ssoConfig, owners, assignments, protocolAnalysis, proxyConfig, copyToClipboard, copied]);
 
   return (
     <div className="relative min-h-[85vh] z-10">

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import "@/lib/ag-grid-modules";
 import { useGovernanceFindings } from "@/hooks/use-governance";
 import { governanceService } from "@/services/governance";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,8 +24,6 @@ import {
   AlertCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface GovernanceFinding {
   id: string;

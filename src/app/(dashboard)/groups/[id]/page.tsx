@@ -82,6 +82,11 @@ export default function GroupDetailPage() {
   const isUnified = group.groupTypes?.includes("Unified");
   const isDynamic = group.membershipType === "Dynamic";
 
+  const tabProps = {
+    group, members, owners, apps, devices, auditLogs, accessReviews,
+    isMembersLoading, isOwnersLoading, isAppsLoading, isDevicesLoading, isLogsLoading, isReviewsLoading,
+  };
+
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "members", label: `Members (${members.length})` },
@@ -94,11 +99,6 @@ export default function GroupDetailPage() {
     { id: "audit", label: `Audit Logs (${auditLogs.length})` },
     { id: "properties", label: "Properties" },
   ];
-
-  const tabProps = useMemo(() => ({
-    group, members, owners, apps, devices, auditLogs, accessReviews,
-    isMembersLoading, isOwnersLoading, isAppsLoading, isDevicesLoading, isLogsLoading, isReviewsLoading,
-  }), [group, members, owners, apps, devices, auditLogs, accessReviews, isMembersLoading, isOwnersLoading, isAppsLoading, isDevicesLoading, isLogsLoading, isReviewsLoading]);
 
   return (
     <div>

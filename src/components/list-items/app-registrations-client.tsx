@@ -4,7 +4,7 @@ import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import "@/lib/ag-grid-modules";
 import { useApplications } from "@/hooks/use-applications";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,8 +13,6 @@ import { RefreshCw, Code2 } from "lucide-react";
 import type { EntraApplication } from "@/types/application";
 import type { PagedResponse } from "@/types/common";
 import { formatDate } from "@/lib/utils";
-
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 function extractApplications(data: PagedResponse<EntraApplication> | EntraApplication[] | unknown): EntraApplication[] {
   if (Array.isArray(data)) return data;

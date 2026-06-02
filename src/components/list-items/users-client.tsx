@@ -4,7 +4,7 @@ import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import "@/lib/ag-grid-modules";
 import { useUsers } from "@/hooks/use-users";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,8 +13,6 @@ import { RefreshCw, Users as UsersIcon } from "lucide-react";
 import type { SigmaUserDto } from "@/types/user";
 import type { PagedResponse } from "@/types/common";
 import { getInitials } from "@/lib/utils";
-
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 function extractUsers(data: PagedResponse<SigmaUserDto> | SigmaUserDto[] | unknown): SigmaUserDto[] {
   if (Array.isArray(data)) return data;

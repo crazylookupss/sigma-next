@@ -2,6 +2,22 @@ import { getSession } from "next-auth/react";
 
 const DEFAULT_API_BASE = "/api/v1/entra";
 
+// ---------------------------------------------------------------------------
+// Session cache — avoids a fetch to /api/auth/session on every API call.
+// TTL 30s balances freshness vs. round-trip cost.
+// ---------------------------------------------------------------------------
+let cachedSession: Awaited<ReturnType<typeof getSession>> | null = null;
+let sessionExpiresAt = 0;
+const SESSION_CACHE_TTL_MS = 30_000;
+
+async function getCachedSession() {
+  const now = Date.now();
+  if (cachedSession && now < sessionExpiresAt) return cachedSession;
+  cachedSession = await getSession();
+  sessionExpiresAt = now + SESSION_CACHE_TTL_MS;
+  return cachedSession;
+}
+
 export class ApiRequestError extends Error {
   constructor(
     public status: number,
@@ -21,8 +37,7 @@ export async function fetchApi<T>(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { basePath: _, ...fetchOptions } = options ?? {};
 
-  // Extract active NextAuth session containing the Entra ID access token
-  const session = await getSession();
+  const session = await getCachedSession();
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",

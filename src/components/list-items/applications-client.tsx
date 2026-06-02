@@ -4,7 +4,7 @@ import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import "@/lib/ag-grid-modules";
 import { useServicePrincipals, useAppDashboard } from "@/hooks/use-applications";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,8 +14,6 @@ import { SearchInput } from "@/components/shared/search-input";
 import { RefreshCw, AppWindow, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import type { EntraServicePrincipal } from "@/types/application";
 import type { PagedResponse } from "@/types/common";
-
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 function extractServicePrincipals(data: PagedResponse<EntraServicePrincipal> | EntraServicePrincipal[] | unknown): EntraServicePrincipal[] {
   if (Array.isArray(data)) return data;
