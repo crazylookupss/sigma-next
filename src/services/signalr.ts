@@ -103,7 +103,8 @@ export function getSignalRConnection(): HubConnection {
 
   connection = new HubConnectionBuilder()
     .withUrl(getHubUrl(), {
-      transport: HttpTransportType.WebSockets | HttpTransportType.LongPolling,
+      skipNegotiation: true,
+      transport: HttpTransportType.WebSockets,
       accessTokenFactory: async () => {
         const session = await getSession();
         return session?.accessToken ?? "";

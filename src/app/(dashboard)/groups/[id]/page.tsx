@@ -34,14 +34,14 @@ export default function GroupDetailPage() {
   const id = params.id as string;
 
   const { data: group, isLoading: isGroupLoading, error: groupError } = useGroup(id);
-  const { data: members = [], isLoading: isMembersLoading } = useGroupMembers(id);
-  const { data: owners = [], isLoading: isOwnersLoading } = useGroupOwners(id);
-  const { data: apps = [], isLoading: isAppsLoading } = useGroupApplications(id);
-  const { data: devices = [], isLoading: isDevicesLoading } = useGroupDevices(id);
-  const { data: auditLogs = [], isLoading: isLogsLoading } = useGroupAuditLogs(id, 50);
-  const { data: accessReviews = [], isLoading: isReviewsLoading } = useGroupAccessReviews(id);
-
   const [activeTab, setActiveTab] = useState("overview");
+
+  const { data: members = [], isLoading: isMembersLoading } = useGroupMembers(id, activeTab === "members" || activeTab === "overview");
+  const { data: owners = [], isLoading: isOwnersLoading } = useGroupOwners(id, activeTab === "owners" || activeTab === "overview");
+  const { data: apps = [], isLoading: isAppsLoading } = useGroupApplications(id, activeTab === "applications");
+  const { data: devices = [], isLoading: isDevicesLoading } = useGroupDevices(id, activeTab === "devices");
+  const { data: auditLogs = [], isLoading: isLogsLoading } = useGroupAuditLogs(id, 50, activeTab === "audit");
+  const { data: accessReviews = [], isLoading: isReviewsLoading } = useGroupAccessReviews(id, activeTab === "reviews");
 
   const directUsers = useMemo(() => members.filter((m) => m.type === "user").length, [members]);
   const directGroups = useMemo(() => members.filter((m) => m.type === "group").length, [members]);
@@ -94,10 +94,10 @@ export default function GroupDetailPage() {
     { id: "properties", label: "Properties" },
   ];
 
-  const tabProps = {
+  const tabProps = useMemo(() => ({
     group, members, owners, apps, devices, auditLogs, accessReviews,
     isMembersLoading, isOwnersLoading, isAppsLoading, isDevicesLoading, isLogsLoading, isReviewsLoading,
-  };
+  }), [group, members, owners, apps, devices, auditLogs, accessReviews, isMembersLoading, isOwnersLoading, isAppsLoading, isDevicesLoading, isLogsLoading, isReviewsLoading]);
 
   return (
     <div>

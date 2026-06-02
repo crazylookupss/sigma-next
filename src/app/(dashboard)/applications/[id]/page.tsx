@@ -39,11 +39,11 @@ export default function ApplicationDetailPage() {
   const appIdOrId = params.id as string;
 
   const { data: sp, isLoading: spLoading, error: spError, refetch: refetchSp } = useServicePrincipal(appIdOrId);
-  const { data: owners = [], isLoading: ownersLoading } = useServicePrincipalOwners(appIdOrId);
-  const { data: assignments = [], isLoading: assignmentsLoading } = useServicePrincipalAssignments(appIdOrId);
-  const { data: ssoConfig, isLoading: ssoConfigLoading } = useServicePrincipalSsoConfig(appIdOrId);
-  const { data: protocolAnalysis, isLoading: protocolAnalysisLoading, error: protocolError, refetch: refetchProtocol } = useProtocolAnalysis(appIdOrId);
-  const { data: proxyConfig, isLoading: proxyConfigLoading } = useProxyConfiguration(appIdOrId);
+  const { data: owners = [], isLoading: ownersLoading } = useServicePrincipalOwners(appIdOrId, activeTab === "owners" || activeTab === "overview");
+  const { data: assignments = [], isLoading: assignmentsLoading } = useServicePrincipalAssignments(appIdOrId, activeTab === "assignments");
+  const { data: ssoConfig, isLoading: ssoConfigLoading } = useServicePrincipalSsoConfig(appIdOrId, activeTab === "sso");
+  const { data: protocolAnalysis, isLoading: protocolAnalysisLoading, error: protocolError, refetch: refetchProtocol } = useProtocolAnalysis(appIdOrId, activeTab === "sso");
+  const { data: proxyConfig, isLoading: proxyConfigLoading } = useProxyConfiguration(appIdOrId, activeTab === "proxy");
 
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [copied, setCopied] = useState<string | null>(null);
@@ -128,7 +128,7 @@ export default function ApplicationDetailPage() {
     { id: "proxy" as TabId, label: "Application Proxy", icon: Network },
   ];
 
-  const tabProps = { sp, ssoConfig, owners, assignments, protocolAnalysis, proxyConfig, copyToClipboard, copied };
+  const tabProps = useMemo(() => ({ sp, ssoConfig, owners, assignments, protocolAnalysis, proxyConfig, copyToClipboard, copied }), [sp, ssoConfig, owners, assignments, protocolAnalysis, proxyConfig, copyToClipboard, copied]);
 
   return (
     <div className="relative min-h-[85vh] z-10">

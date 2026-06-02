@@ -30,21 +30,20 @@ export function useGroup(id: string) {
   });
 }
 
-export function useGroupMembers(id: string) {
+export function useGroupMembers(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["groups", id, "members"],
     queryFn: async ({ signal }) => {
       const res = await groupService.getGroupMembers(id, signal);
-      // API returns PagedResponse<T>; extract the inner data array
       return (res?.data ?? []) as GroupMember[];
     },
     staleTime: 5 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
 
-export function useGroupOwners(id: string) {
+export function useGroupOwners(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["groups", id, "owners"],
     queryFn: async ({ signal }) => {
@@ -52,12 +51,12 @@ export function useGroupOwners(id: string) {
       return (res?.data ?? []) as GroupOwner[];
     },
     staleTime: 5 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
 
-export function useGroupApplications(id: string) {
+export function useGroupApplications(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["groups", id, "applications"],
     queryFn: async ({ signal }) => {
@@ -65,12 +64,12 @@ export function useGroupApplications(id: string) {
       return (res?.data ?? []) as GroupApplication[];
     },
     staleTime: 5 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
 
-export function useGroupDevices(id: string) {
+export function useGroupDevices(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["groups", id, "devices"],
     queryFn: async ({ signal }) => {
@@ -78,12 +77,12 @@ export function useGroupDevices(id: string) {
       return (res?.data ?? []) as GroupDevice[];
     },
     staleTime: 5 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
 
-export function useGroupAuditLogs(id: string, top: number = 50) {
+export function useGroupAuditLogs(id: string, top: number = 50, enabled?: boolean) {
   return useQuery({
     queryKey: ["groups", id, "audit-logs", top],
     queryFn: async ({ signal }) => {
@@ -91,12 +90,12 @@ export function useGroupAuditLogs(id: string, top: number = 50) {
       return (res?.data ?? []) as GroupAuditLog[];
     },
     staleTime: 5 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
 
-export function useGroupAccessReviews(id: string) {
+export function useGroupAccessReviews(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["groups", id, "access-reviews"],
     queryFn: async ({ signal }) => {
@@ -104,7 +103,7 @@ export function useGroupAccessReviews(id: string) {
       return (res?.data ?? []) as GroupAccessReview[];
     },
     staleTime: 5 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }

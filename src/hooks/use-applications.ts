@@ -122,54 +122,54 @@ export function useApplicationManifest(id: string) {
   });
 }
 
-export function useServicePrincipalOwners(id: string) {
+export function useServicePrincipalOwners(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["service-principals", id, "owners"],
     queryFn: ({ signal }) => applicationService.getServicePrincipalOwners(id, signal),
     staleTime: 5 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
 
-export function useServicePrincipalAssignments(id: string) {
+export function useServicePrincipalAssignments(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["service-principals", id, "assignments"],
     queryFn: ({ signal }) => applicationService.getServicePrincipalAssignments(id, signal),
     staleTime: 5 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
 
-export function useServicePrincipalSsoConfig(id: string) {
+export function useServicePrincipalSsoConfig(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["service-principals", id, "sso-config"],
     queryFn: ({ signal }) => applicationService.getServicePrincipalSsoConfig(id, signal),
     staleTime: 30 * 1000,
     refetchInterval: 120 * 1000,
     refetchIntervalInBackground: false,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
 
-export function useProtocolAnalysis(id: string) {
+export function useProtocolAnalysis(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["service-principals", id, "protocol-analysis"],
     queryFn: ({ signal }) => applicationService.getProtocolAnalysis(id, signal),
     staleTime: 2 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
 
-export function useProxyConfiguration(id: string) {
+export function useProxyConfiguration(id: string, enabled?: boolean) {
   return useQuery({
     queryKey: ["service-principals", id, "proxy-configuration"],
     queryFn: ({ signal }) => applicationService.getProxyConfiguration(id, signal),
     staleTime: 5 * 60 * 1000,
-    enabled: !!id,
+    enabled: enabled !== undefined ? enabled && !!id : !!id,
     retry: 1,
   });
 }
