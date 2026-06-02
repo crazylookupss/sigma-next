@@ -7,6 +7,9 @@ import { RowAutoHeightModule } from "ag-grid-community";
 import { RenderApiModule } from "ag-grid-community";
 import { CellApiModule } from "ag-grid-community";
 import { PinnedRowModule } from "ag-grid-community";
+import { CellStyleModule } from "ag-grid-community";
+import { ValidationModule } from "ag-grid-community";
+import { RowStyleModule } from "ag-grid-community";
 
 // Register only the modules actually used across all grids.
 // Replaces AllCommunityModule (~500KB) with ~120KB of targeted imports.
@@ -19,4 +22,7 @@ ModuleRegistry.registerModules([
   RenderApiModule,
   CellApiModule,
   PinnedRowModule,
+  CellStyleModule,
+  ValidationModule,
+  RowStyleModule,
 ]);
