@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -23,6 +24,21 @@ const nextConfig: NextConfig = {
   },
 
   async headers() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5107";
+    const apiOrigin = new URL(apiUrl).origin;
+    const sentryDsn = process.env.NEXT_PUBLIC_SENTRY_DSN || "";
+    let sentryOrigin = "";
+    try {
+      if (sentryDsn) sentryOrigin = new URL(sentryDsn).origin;
+    } catch {}
+
+    const connectSrc = [
+      "'self'",
+      apiOrigin,
+      apiOrigin.replace("http", "ws"),
+      sentryOrigin,
+    ].filter(Boolean).join(" ");
+
     return [
       {
         source: "/:path*",
@@ -33,6 +49,25 @@ const nextConfig: NextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+          { key: "X-XSS-Protection", value: "0" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https:",
+              "font-src 'self'",
+              `connect-src ${connectSrc}`,
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join("; "),
           },
         ],
       },
@@ -55,4 +90,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // Automatically tree-shake Sentry logger to reduce bundle size
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+});

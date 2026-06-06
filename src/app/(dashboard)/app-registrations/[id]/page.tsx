@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { getInitials, getAvatarColor } from "@/lib/utils";
 import {
   useApplication,
   useApplicationOwners,
@@ -78,33 +79,7 @@ export default function AppRegistrationDetailPage() {
     return "Client Secrets / Keys";
   }, [app]);
 
-  // Initials generator
-  const getInitials = (name?: string) => {
-    if (!name) return "A";
-    const parts = name.split(" ").filter(Boolean);
-    if (parts.length === 0) return "A";
-    if (parts.length === 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  };
-
-  // Initial colors
-  const getAvatarColor = (name?: string) => {
-    if (!name) return "bg-primary/20 text-primary";
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const colors = [
-      "bg-blue-500/20 text-blue-500",
-      "bg-emerald-500/20 text-emerald-500",
-      "bg-purple-500/20 text-purple-500",
-      "bg-amber-500/20 text-amber-500",
-      "bg-rose-500/20 text-rose-500",
-      "bg-teal-500/20 text-teal-500",
-      "bg-indigo-500/20 text-indigo-500",
-    ];
-    return colors[Math.abs(hash) % colors.length];
-  };
+  // getInitials and getAvatarColor imported from @/lib/utils
 
   if (isAppLoading) {
     return (

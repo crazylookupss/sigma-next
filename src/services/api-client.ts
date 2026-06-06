@@ -55,6 +55,13 @@ export async function fetchApi<T>(
   });
 
   if (!res.ok) {
+    if (res.status === 401) {
+      // Session expired or invalid — redirect to re-authenticate
+      cachedSession = null;
+      sessionExpiresAt = 0;
+      window.location.href = "/api/auth/signin";
+      throw new ApiRequestError(401, "Session expired. Redirecting to sign-in...");
+    }
     const text = await res.text().catch(() => "Unknown error");
     throw new ApiRequestError(res.status, text);
   }

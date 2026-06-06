@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { AgGridReact } from "ag-grid-react";
+import dynamic from "next/dynamic";
 import type { ColDef } from "ag-grid-community";
 import "@/lib/ag-grid-modules";
 import { useGovernanceFindings } from "@/hooks/use-governance";
@@ -21,9 +21,16 @@ import {
   Users,
   KeyRound,
   FileKey,
-  AlertCircle
+  AlertCircle,
+  CircleOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const AgGridReact = dynamic<any>(
+  () => import("ag-grid-react").then((m) => m.AgGridReact),
+  { ssr: false }
+);
 
 interface GovernanceFinding {
   id: string;
@@ -37,11 +44,14 @@ interface GovernanceFinding {
   actionUrl: string;
 }
 
+import { useQueryClient } from "@tanstack/react-query";
+
 export default function GovernanceFindingsPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data, isLoading, error, refetch } = useGovernanceFindings();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"ownerless-apps" | "ownerless-groups" | "expired-secrets" | "expiring-secrets" | "mfa-users">("ownerless-apps");
+  const [activeTab, setActiveTab] = useState<"ownerless-apps" | "ownerless-groups" | "expired-secrets" | "expiring-secrets" | "mfa-users" | "empty-stale-groups">("ownerless-apps");
   
   // Custom toast notification state
   const [toast, setToast] = useState<{ show: boolean; message: string; type: "success" | "info" }>({
@@ -76,11 +86,17 @@ export default function GovernanceFindingsPage() {
     return findings.filter(f => f.category === "Security" || f.category === "Configuration");
   }, [findings]);
 
+  const emptyStaleGroups = useMemo(() => {
+    return findings.filter(f => f.category === "Compliance" && f.entityType === "Group");
+  }, [findings]);
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
+      // Force a fresh backend scan (bypasses 2-min API cache)
       await governanceService.getFindings(true);
-      await refetch();
+      // Invalidate React Query cache so refetch gets fresh data
+      await queryClient.invalidateQueries({ queryKey: ["governance", "findings"] });
       showToast("Real-time governance analysis completed successfully!", "success");
     } catch (err) {
       console.error(err);
@@ -90,12 +106,17 @@ export default function GovernanceFindingsPage() {
     }
   };
 
-  const showToast = (message: string, type: "success" | "info" = "success") => {
+  const showToast = useCallback((message: string, type: "success" | "info" = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast(prev => ({ ...prev, show: false }));
+  }, []);
+
+  useEffect(() => {
+    if (!toast.show) return;
+    const timer = setTimeout(() => {
+      setToast((prev) => ({ ...prev, show: false }));
     }, 4500);
-  };
+    return () => clearTimeout(timer);
+  }, [toast.show]);
 
   const handleNotify = (finding: GovernanceFinding) => {
     let recipient = "Global Administrators";
@@ -246,7 +267,7 @@ export default function GovernanceFindingsPage() {
       </div>
 
       {/* Audit Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <Card 
           onClick={() => setActiveTab("ownerless-apps")}
           className={`cursor-pointer hover:border-primary/50 transition-all border ${activeTab === "ownerless-apps" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-border/30"}`}
@@ -299,6 +320,17 @@ export default function GovernanceFindingsPage() {
             <p className="text-2xl font-bold text-info">{mfaUsers.length}</p>
             <p className="text-[10px] text-muted-foreground mt-1 font-medium flex items-center justify-center gap-1">
               <UserCheck size={10} className="text-blue-500" /> Stale & MFA-Deficient
+            </p>
+          </CardContent>
+        </Card>
+        <Card 
+          onClick={() => setActiveTab("empty-stale-groups")}
+          className={`cursor-pointer hover:border-primary/50 transition-all border ${activeTab === "empty-stale-groups" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-border/30"}`}
+        >
+          <CardContent className="py-4 text-center">
+            <p className="text-2xl font-bold text-muted-foreground">{emptyStaleGroups.length}</p>
+            <p className="text-[10px] text-muted-foreground mt-1 font-medium flex items-center justify-center gap-1">
+              <CircleOff size={10} className="text-slate-400" /> Empty Stale Groups
             </p>
           </CardContent>
         </Card>
@@ -357,6 +389,16 @@ export default function GovernanceFindingsPage() {
             }`}
           >
             Users & General Audit ({mfaUsers.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("empty-stale-groups")}
+            className={`px-4 py-3 text-xs font-semibold border-b-2 transition-all ${
+              activeTab === "empty-stale-groups"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Empty Stale Groups ({emptyStaleGroups.length})
           </button>
         </div>
 
@@ -450,6 +492,26 @@ export default function GovernanceFindingsPage() {
                   entityNameColumn,
                   { headerName: "Audit Finding / Warning", field: "title", width: 250 },
                   { headerName: "Description", field: "description", flex: 1 },
+                  severityColumn,
+                  actionColumn
+                ]}
+                pagination={true}
+                paginationPageSize={10}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                defaultColDef={defaultColDef}
+                rowHeight={50}
+              />
+            </div>
+          )}
+
+          {activeTab === "empty-stale-groups" && (
+            <div className="ag-theme-quartz" style={{ height: 420 }}>
+              <AgGridReact
+                rowData={emptyStaleGroups}
+                columnDefs={[
+                  entityNameColumn,
+                  { headerName: "Issue Title", field: "title", flex: 1 },
+                  { headerName: "Description", field: "description", flex: 1.2 },
                   severityColumn,
                   actionColumn
                 ]}
