@@ -9,10 +9,10 @@ export default function LandingPage() {
       <div className="glow-sphere-2" />
 
       <div className="relative z-10 text-center max-w-lg px-6">
-        <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/25 flex items-center justify-center mx-auto mb-8 shadow-lg shadow-primary/5">
+        <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/25 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/5">
           <Image
             src="/logo/logo-icon.png"
-            alt="SIGMA Logo"
+            alt="SIGMA Logo Mark"
             width={56}
             height={56}
             className="object-contain"
@@ -20,9 +20,18 @@ export default function LandingPage() {
           />
         </div>
 
-        <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight">
-          SIGMA Access Portal
-        </h1>
+        <div className="flex justify-center mb-6">
+          <Image
+            src="/logo/logo-text.png"
+            alt="SIGMA - Identity, Governance, Security, Intelligence"
+            width={340}
+            height={98}
+            className="object-contain"
+            priority
+          />
+        </div>
+
+        <h1 className="sr-only">SIGMA Access Portal</h1>
         <p className="text-muted-foreground mb-10 leading-relaxed text-sm">
           Secure Identity, Governance &amp; Access Management for Microsoft Entra ID.
           Monitor users, groups, applications, and audit your directory with
