@@ -12,6 +12,32 @@ import { SearchInput } from "@/components/shared/search-input";
 import { RefreshCw, Group as GroupsIcon } from "lucide-react";
 import type { EntraGroup } from "@/types/group";
 
+import { memo } from "react";
+
+const GroupDisplayNameCell = memo((params: { value: string }) => (
+  <div className="flex items-center gap-3 h-full">
+    <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-500 flex items-center justify-center text-sm font-bold">G</div>
+    <span className="font-medium">{params.value}</span>
+  </div>
+));
+GroupDisplayNameCell.displayName = "GroupDisplayNameCell";
+
+const GroupDescriptionCell = memo((params: { value: string | null }) => (
+  <span className="text-muted-foreground">{params.value ?? "—"}</span>
+));
+GroupDescriptionCell.displayName = "GroupDescriptionCell";
+
+const GroupTypeCell = memo((params: { value: string[] }) => {
+  const isUnified = params.value?.includes("Unified");
+  return <Badge variant={isUnified ? "default" : "secondary"}>{isUnified ? "Microsoft 365" : "Security"}</Badge>;
+});
+GroupTypeCell.displayName = "GroupTypeCell";
+
+const GroupVisibilityCell = memo((params: { value: string | null }) => (
+  <Badge variant="outline">{params.value ?? "Private"}</Badge>
+));
+GroupVisibilityCell.displayName = "GroupVisibilityCell";
+
 export function GroupsClient() {
   const router = useRouter();
   const { data, isLoading, error, refetch, isFetching } = useGroups();
@@ -45,12 +71,7 @@ export function GroupsClient() {
         sortable: true,
         filter: "agTextColumnFilter",
         width: 280,
-        cellRenderer: (params: { value: string }) => (
-          <div className="flex items-center gap-3 h-full">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-500 flex items-center justify-center text-sm font-bold">G</div>
-            <span className="font-medium">{params.value}</span>
-          </div>
-        ),
+        cellRenderer: GroupDisplayNameCell,
       },
       {
         field: "description",
@@ -58,9 +79,7 @@ export function GroupsClient() {
         sortable: true,
         filter: "agTextColumnFilter",
         width: 300,
-        cellRenderer: (params: { value: string | null }) => (
-          <span className="text-muted-foreground">{params.value ?? "—"}</span>
-        ),
+        cellRenderer: GroupDescriptionCell,
       },
       { field: "mail", headerName: "Mail", sortable: true, filter: "agTextColumnFilter", width: 250 },
       {
@@ -68,10 +87,7 @@ export function GroupsClient() {
         headerName: "Type",
         sortable: true,
         width: 140,
-        cellRenderer: (params: { value: string[] }) => {
-          const isUnified = params.value?.includes("Unified");
-          return <Badge variant={isUnified ? "default" : "secondary"}>{isUnified ? "Microsoft 365" : "Security"}</Badge>;
-        },
+        cellRenderer: GroupTypeCell,
       },
       { field: "memberCount", headerName: "Members", sortable: true, width: 110, type: "numericColumn" },
       { field: "ownersCount", headerName: "Owners", sortable: true, width: 110, type: "numericColumn" },
@@ -80,9 +96,7 @@ export function GroupsClient() {
         headerName: "Visibility",
         sortable: true,
         width: 120,
-        cellRenderer: (params: { value: string | null }) => (
-          <Badge variant="outline">{params.value ?? "Private"}</Badge>
-        ),
+        cellRenderer: GroupVisibilityCell,
       },
     ],
     []

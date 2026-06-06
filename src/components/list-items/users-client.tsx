@@ -27,6 +27,30 @@ function extractUsers(data: PagedResponse<SigmaUserDto> | SigmaUserDto[] | unkno
   return [];
 }
 
+import { memo } from "react";
+
+const DisplayNameCell = memo((params: { value: string }) => (
+  <div className="flex items-center gap-3 h-full">
+    <div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">
+      {getInitials(params.value)}
+    </div>
+    <span className="font-medium">{params.value}</span>
+  </div>
+));
+DisplayNameCell.displayName = "DisplayNameCell";
+
+const StatusCell = memo((params: { value: boolean | null }) => {
+  if (params.value === true) return <div className="flex items-center gap-2 h-full"><span className="w-2 h-2 rounded-full bg-success" /><span className="text-sm font-medium text-success">Enabled</span></div>;
+  if (params.value === false) return <div className="flex items-center gap-2 h-full"><span className="w-2 h-2 rounded-full bg-muted-foreground" /><span className="text-sm font-medium text-muted-foreground">Disabled</span></div>;
+  return <div className="flex items-center gap-2 h-full"><span className="w-2 h-2 rounded-full bg-muted-foreground/50" /><span className="text-sm">Unknown</span></div>;
+});
+StatusCell.displayName = "StatusCell";
+
+const UserTypeCell = memo((params: { value: string | null }) =>
+  params.value ? <Badge variant="secondary">{params.value}</Badge> : <Badge variant="outline">Member</Badge>
+);
+UserTypeCell.displayName = "UserTypeCell";
+
 export function UsersClient() {
   const router = useRouter();
   const { data, isLoading, error, refetch, isFetching } = useUsers();
@@ -62,14 +86,7 @@ export function UsersClient() {
         sortable: true,
         filter: "agTextColumnFilter",
         width: 250,
-        cellRenderer: (params: { value: string }) => (
-          <div className="flex items-center gap-3 h-full">
-            <div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">
-              {getInitials(params.value)}
-            </div>
-            <span className="font-medium">{params.value}</span>
-          </div>
-        ),
+        cellRenderer: DisplayNameCell,
       },
       { field: "userPrincipalName", headerName: "UPN", sortable: true, filter: "agTextColumnFilter", width: 280 },
       { field: "mail", headerName: "Mail", sortable: true, filter: "agTextColumnFilter", width: 250 },
@@ -79,11 +96,7 @@ export function UsersClient() {
         headerName: "Status",
         sortable: true,
         width: 130,
-        cellRenderer: (params: { value: boolean | null }) => {
-          if (params.value === true) return <div className="flex items-center gap-2 h-full"><span className="w-2 h-2 rounded-full bg-success" /><span className="text-sm font-medium text-success">Enabled</span></div>;
-          if (params.value === false) return <div className="flex items-center gap-2 h-full"><span className="w-2 h-2 rounded-full bg-muted-foreground" /><span className="text-sm font-medium text-muted-foreground">Disabled</span></div>;
-          return <div className="flex items-center gap-2 h-full"><span className="w-2 h-2 rounded-full bg-muted-foreground/50" /><span className="text-sm">Unknown</span></div>;
-        },
+        cellRenderer: StatusCell,
       },
       {
         field: "userType",
@@ -91,8 +104,7 @@ export function UsersClient() {
         sortable: true,
         filter: "agTextColumnFilter",
         width: 140,
-        cellRenderer: (params: { value: string | null }) =>
-          params.value ? <Badge variant="secondary">{params.value}</Badge> : <Badge variant="outline">Member</Badge>,
+        cellRenderer: UserTypeCell,
       },
     ],
     []

@@ -28,6 +28,37 @@ function extractServicePrincipals(data: PagedResponse<EntraServicePrincipal> | E
   return [];
 }
 
+import { memo } from "react";
+
+const AppDisplayNameCell = memo((params: { value: string }) => (
+  <div className="flex items-center gap-3 h-full">
+    <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center text-sm font-bold">
+      {params.value?.[0]?.toUpperCase() ?? "A"}
+    </div>
+    <span className="font-medium">{params.value}</span>
+  </div>
+));
+AppDisplayNameCell.displayName = "AppDisplayNameCell";
+
+const AppStatusCell = memo((params: { value: string }) => {
+  const map: Record<string, "active" | "warning" | "error"> = { active: "active", warning: "warning", error: "error" };
+  const val = params.value?.toLowerCase() ?? "";
+  return <StatusBadge status={map[val] ?? "unknown"} />;
+});
+AppStatusCell.displayName = "AppStatusCell";
+
+const AppAssignmentCell = memo((params: { value: boolean }) => (
+  <Badge variant={params.value ? "default" : "secondary"}>
+    {params.value ? "Required" : "Optional"}
+  </Badge>
+));
+AppAssignmentCell.displayName = "AppAssignmentCell";
+
+const AppSSOCell = memo((params: { value: string | null }) => (
+  <Badge variant="outline">{params.value ?? "—"}</Badge>
+));
+AppSSOCell.displayName = "AppSSOCell";
+
 export function ApplicationsClient() {
   const router = useRouter();
   const { data: spData, isLoading, error, refetch, isFetching } = useServicePrincipals();
@@ -63,14 +94,7 @@ export function ApplicationsClient() {
         filter: "agTextColumnFilter",
         minWidth: 300,
         flex: 2,
-        cellRenderer: (params: { value: string }) => (
-          <div className="flex items-center gap-3 h-full">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center text-sm font-bold">
-              {params.value?.[0]?.toUpperCase() ?? "A"}
-            </div>
-            <span className="font-medium">{params.value}</span>
-          </div>
-        ),
+        cellRenderer: AppDisplayNameCell,
       },
       {
         field: "signInStatus",
@@ -78,11 +102,7 @@ export function ApplicationsClient() {
         sortable: true,
         minWidth: 120,
         flex: 1,
-        cellRenderer: (params: { value: string }) => {
-          const map: Record<string, "active" | "warning" | "error"> = { active: "active", warning: "warning", error: "error" };
-          const val = params.value?.toLowerCase() ?? "";
-          return <StatusBadge status={map[val] ?? "unknown"} />;
-        },
+        cellRenderer: AppStatusCell,
       },
       {
         field: "appRoleAssignmentRequired",
@@ -90,11 +110,7 @@ export function ApplicationsClient() {
         sortable: true,
         minWidth: 130,
         flex: 1,
-        cellRenderer: (params: { value: boolean }) => (
-          <Badge variant={params.value ? "default" : "secondary"}>
-            {params.value ? "Required" : "Optional"}
-          </Badge>
-        ),
+        cellRenderer: AppAssignmentCell,
       },
       {
         field: "preferredSingleSignOnMode",
@@ -102,9 +118,7 @@ export function ApplicationsClient() {
         sortable: true,
         minWidth: 140,
         flex: 1,
-        cellRenderer: (params: { value: string | null }) => (
-          <Badge variant="outline">{params.value ?? "—"}</Badge>
-        ),
+        cellRenderer: AppSSOCell,
       },
     ],
     []

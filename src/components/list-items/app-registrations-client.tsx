@@ -27,6 +27,33 @@ function extractApplications(data: PagedResponse<EntraApplication> | EntraApplic
   return [];
 }
 
+import { memo } from "react";
+
+const RegDisplayNameCell = memo((params: { value: string }) => (
+  <div className="flex items-center gap-3 h-full">
+    <div className="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-500 flex items-center justify-center text-sm font-bold">
+      {params.value?.[0]?.toUpperCase() ?? "A"}
+    </div>
+    <span className="font-medium">{params.value}</span>
+  </div>
+));
+RegDisplayNameCell.displayName = "RegDisplayNameCell";
+
+const RegAppIdCell = memo((params: { value: string }) => (
+  <span className="font-mono text-xs text-muted-foreground">{params.value}</span>
+));
+RegAppIdCell.displayName = "RegAppIdCell";
+
+const RegAudienceCell = memo((params: { value: string }) => (
+  <Badge variant="outline">{params.value}</Badge>
+));
+RegAudienceCell.displayName = "RegAudienceCell";
+
+const RegCreatedCell = memo((params: { value: string | null }) => (
+  <span className="text-muted-foreground">{formatDate(params.value)}</span>
+));
+RegCreatedCell.displayName = "RegCreatedCell";
+
 export function AppRegistrationsClient() {
   const router = useRouter();
   const { data, isLoading, error, refetch, isFetching } = useApplications();
@@ -60,14 +87,7 @@ export function AppRegistrationsClient() {
         sortable: true,
         filter: "agTextColumnFilter",
         width: 300,
-        cellRenderer: (params: { value: string }) => (
-          <div className="flex items-center gap-3 h-full">
-            <div className="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-500 flex items-center justify-center text-sm font-bold">
-              {params.value?.[0]?.toUpperCase() ?? "A"}
-            </div>
-            <span className="font-medium">{params.value}</span>
-          </div>
-        ),
+        cellRenderer: RegDisplayNameCell,
       },
       {
         field: "appId",
@@ -75,9 +95,7 @@ export function AppRegistrationsClient() {
         sortable: true,
         filter: "agTextColumnFilter",
         width: 280,
-        cellRenderer: (params: { value: string }) => (
-          <span className="font-mono text-xs text-muted-foreground">{params.value}</span>
-        ),
+        cellRenderer: RegAppIdCell,
       },
       { field: "publisherDomain", headerName: "Publisher Domain", sortable: true, filter: "agTextColumnFilter", width: 200 },
       {
@@ -85,16 +103,14 @@ export function AppRegistrationsClient() {
         headerName: "Sign-In Audience",
         sortable: true,
         width: 180,
-        cellRenderer: (params: { value: string }) => <Badge variant="outline">{params.value}</Badge>,
+        cellRenderer: RegAudienceCell,
       },
       {
         field: "createdDateTime",
         headerName: "Created",
         sortable: true,
         width: 160,
-        cellRenderer: (params: { value: string | null }) => (
-          <span className="text-muted-foreground">{formatDate(params.value)}</span>
-        ),
+        cellRenderer: RegCreatedCell,
       },
     ],
     []
