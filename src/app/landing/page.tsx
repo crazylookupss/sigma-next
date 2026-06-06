@@ -1,5 +1,6 @@
-import { Shield, Users, Lock, BarChart3 } from "lucide-react";
+import { Users, Lock, BarChart3 } from "lucide-react";
 import { SignInButton } from "@/components/shared/sign-in-button";
+import Image from "next/image";
 
 export default function LandingPage() {
   return (
@@ -8,8 +9,15 @@ export default function LandingPage() {
       <div className="glow-sphere-2" />
 
       <div className="relative z-10 text-center max-w-lg px-6">
-        <div className="w-20 h-20 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-8 shadow-lg shadow-primary/10">
-          <Shield className="w-10 h-10 text-primary" />
+        <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/25 flex items-center justify-center mx-auto mb-8 shadow-lg shadow-primary/5">
+          <Image
+            src="/logo/logo-icon.png"
+            alt="SIGMA Logo"
+            width={56}
+            height={56}
+            className="object-contain"
+            priority
+          />
         </div>
 
         <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight">

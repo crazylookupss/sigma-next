@@ -1,4 +1,4 @@
-# SIGMA Web Client
+# <img src="public/logo/logo-icon.png" alt="SIGMA Logo" width="36" align="center" /> SIGMA Web Client
 
 > **S**ecure **I**dentity **G**ateway & **M**anagement **A**dmin Dashboard
 
